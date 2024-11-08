@@ -1,6 +1,8 @@
 plugins {
     alias(libs.plugins.android.application)
     alias(libs.plugins.kotlin.android)
+    // parcelize
+    id("kotlin-parcelize")
 }
 
 android {
@@ -66,4 +68,25 @@ dependencies {
     androidTestImplementation(libs.androidx.ui.test.junit4)
     debugImplementation(libs.androidx.ui.tooling)
     debugImplementation(libs.androidx.ui.test.manifest)
+
+    //Retrofit2
+//    implementation("com.google.code.gson:gson:2.10.1")
+    implementation("com.squareup.retrofit2:retrofit:2.9.0")
+    implementation("com.squareup.retrofit2:converter-gson:2.9.0")
+    implementation("com.squareup.retrofit2:converter-moshi:2.0.0")
+//    implementation("com.squareup.okhttp3:okhttp:4.10.0")
+//    implementation("com.squareup.okhttp3:logging-interceptor:4.10.0")
+
+    //RxJava
+    implementation("io.reactivex.rxjava2:rxjava:2.2.3")
+    implementation("io.reactivex.rxjava2:rxandroid:2.1.0")
+
+    //ViewModel
+    implementation("androidx.lifecycle:lifecycle-viewmodel-compose:2.8.6")
+
+    //Navigation
+    implementation("androidx.navigation:navigation-compose:2.8.2")
+
+    implementation(libs.androidx.runtime.livedata)
+
 }
