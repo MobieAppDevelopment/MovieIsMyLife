@@ -18,8 +18,16 @@ class MainActivity : ComponentActivity() {
         enableEdgeToEdge()
         setContent {
             MovieIsMyLifeTheme {
-                val viewModel = viewModel<MovieListViewModel>() // 타입을 명시적으로 지정
-                MainPage(viewModel = viewModel)
+                val movieListViewModel = viewModel<MovieListViewModel>() // 타입을 명시적으로 지정
+                movieListViewModel.fetchPopularMovies()
+                movieListViewModel.fetchGenres()
+
+                MainPage(movieListViewModel = movieListViewModel)
+
+                // 임의로 일단 Search를 적용한 것
+                // 나중에 search button에 navigation과 함께 적용해야 함
+//                movieListViewModel.fetchSearchMovies("인생", page = 1)
+//                SearchResultScreen(movieListViewModel = movieListViewModel)
             }
         }
     }

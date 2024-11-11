@@ -12,4 +12,19 @@ interface ApiService {
         @Query("api_key") apiKey: String = API_KEY,
         @Query("language") language: String = "ko-KR"
     ): Call<MovieResponse>
+
+    @GET("search/movie")
+    fun getSearchMovies(
+        @Query("page") page: Int = 1,
+        @Query("api_key") apiKey: String = API_KEY,
+        @Query("language") language: String = "ko-KR",
+        @Query("include_adult") include_adult: Boolean = true,
+        @Query("query") query: String
+    ): Call<MovieResponse>
+
+    @GET("genre/movie/list")
+    fun getMovieGenres(
+        @Query("api_key") apiKey: String = API_KEY,
+        @Query("language") language: String = "ko-KR",
+    ): Call<GenreResponse>
 }
