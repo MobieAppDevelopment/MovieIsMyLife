@@ -1,6 +1,5 @@
 package com.example.movieismylife
 
-import android.graphics.Paint.Style
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
@@ -12,7 +11,6 @@ import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
-import androidx.compose.ui.text.font.FontSynthesis.Companion.Style
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
@@ -24,7 +22,7 @@ import com.example.movieismylife.viewmodel.MovieReviewViewModel
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
-fun MovieReviewScreen(viewModel: MovieReviewViewModel = viewModel()) {
+fun MovieReviewManagementPage(viewModel: MovieReviewViewModel = viewModel()) {
     val reviews by viewModel.reviews.collectAsState()
     val sortOption by viewModel.sortOption.collectAsState()
     val reviewType by viewModel.reviewType.collectAsState()

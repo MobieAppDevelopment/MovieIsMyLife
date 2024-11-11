@@ -9,8 +9,6 @@ import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.lifecycle.viewmodel.compose.viewModel
-import com.example.movieismylife.model.MovieReview
-import com.example.movieismylife.model.Movies
 import com.example.movieismylife.ui.theme.MovieIsMyLifeTheme
 import com.example.movieismylife.viewmodel.MovieListViewModel
 import com.example.movieismylife.viewmodel.MovieReviewViewModel
@@ -29,7 +27,7 @@ class MainActivity : ComponentActivity() {
 
                 val movieReview = viewModel<MovieReviewViewModel>()
 
-                MovieReviewScreen(viewModel = movieReview)
+                MovieReviewManagementPage(viewModel = movieReview)
 
                 // 임의로 일단 Search를 적용한 것
                 // 나중에 search button에 navigation과 함께 적용해야 함
