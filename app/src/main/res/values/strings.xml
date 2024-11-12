@@ -1,3 +1,5 @@
 <resources>
     <string name="app_name">MovieIsMyLife</string>
+    <string name="channel_name">영화 추천</string>
+    <string name="channel_description">랜덤한 영화 추천을 제공 합니다.</string>
 </resources>
