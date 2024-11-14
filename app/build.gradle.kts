@@ -108,4 +108,6 @@ dependencies {
 
     implementation(libs.androidx.runtime.livedata)
 
+    // coil(For image load)
+    implementation("io.coil-kt:coil-compose:2.2.2")
 }
