@@ -1,5 +1,7 @@
 package com.example.movieismylife
 
+import LoginPage
+import SignUpPage
 import android.content.pm.PackageManager
 import android.os.Build
 import android.os.Bundle
@@ -53,7 +55,9 @@ class MainActivity : ComponentActivity() {
 
                 val movieReview = viewModel<MovieReviewViewModel>()
 
-                MovieReviewManagementPage(viewModel = movieReview)
+                //MovieReviewManagementPage(viewModel = movieReview)
+                //LoginPage()
+                SignUpPage()
 
                 // 임의로 일단 Search를 적용한 것
                 // 나중에 search button에 navigation과 함께 적용해야 함
@@ -76,18 +80,18 @@ class MainActivity : ComponentActivity() {
 
 
 
-@Composable
-fun Greeting(name: String, modifier: Modifier = Modifier) {
-    Text(
-        text = "Hello $name!",
-        modifier = modifier
-    )
-}
-
-@Preview(showBackground = true)
-@Composable
-fun GreetingPreview() {
-    MovieIsMyLifeTheme {
-        Greeting("Android")
-    }
-}
+//@Composable
+//fun Greeting(name: String, modifier: Modifier = Modifier) {
+//    Text(
+//        text = "Hello $name!",
+//        modifier = modifier
+//    )
+//}
+//
+//@Preview(showBackground = true)
+//@Composable
+//fun GreetingPreview() {
+//    MovieIsMyLifeTheme {
+//        Greeting("Android")
+//    }
+//}
