@@ -15,6 +15,7 @@ import androidx.compose.ui.tooling.preview.Preview
 import androidx.core.content.ContextCompat
 import androidx.lifecycle.viewmodel.compose.viewModel
 import com.example.movieismylife.ui.theme.MovieIsMyLifeTheme
+import com.example.movieismylife.viewmodel.MovieDetailViewModel
 import com.example.movieismylife.viewmodel.MovieListViewModel
 import com.example.movieismylife.viewmodel.MovieReviewViewModel
 
@@ -53,13 +54,17 @@ class MainActivity : ComponentActivity() {
 
                 val movieReview = viewModel<MovieReviewViewModel>()
 
-                MovieReviewManagementPage(viewModel = movieReview)
+//                MovieReviewManagementPage(viewModel = movieReview)
 
                 // 임의로 일단 Search를 적용한 것
                 // 나중에 search button에 navigation과 함께 적용해야 함
 //                movieListViewModel.fetchSearchMovies("인생", page = 1)
 //                SearchResultScreen(movieListViewModel = movieListViewModel)
 
+                // movieDetail api test
+                val movieDetailViewModel = viewModel<MovieDetailViewModel>() // 타입을 명시적으로 지정
+                MovieDetailPage(movieDetailViewModel = movieDetailViewModel)
+                movieDetailViewModel.fetchMovieDetail()
             }
         }
     }
