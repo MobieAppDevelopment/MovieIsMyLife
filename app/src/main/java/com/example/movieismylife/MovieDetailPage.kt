@@ -72,6 +72,7 @@ fun MovieDetailPage(
     movieDetailViewModel: MovieDetailViewModel,
     movieReviewViewModel: MovieReviewViewModel
 ) {
+    movieDetailViewModel.fetchMovieDetail()
     // Sample data
     val movieDetail = movieDetailViewModel._movieDetail.value
     val poster_path = "https://media.themoviedb.org/t/p/w220_and_h330_face/"
