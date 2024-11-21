@@ -17,6 +17,7 @@ import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.width
+import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.LazyRow
 import androidx.compose.foundation.lazy.items
 import androidx.compose.foundation.lazy.itemsIndexed
@@ -42,6 +43,7 @@ import androidx.compose.material3.Text
 import androidx.compose.material3.TopAppBar
 import androidx.compose.material3.TopAppBarDefaults
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
@@ -57,13 +59,19 @@ import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import coil.compose.rememberAsyncImagePainter
+import com.example.movieismylife.enum.SortOption
 import com.example.movieismylife.response.MovieDetailResponse
+import com.example.movieismylife.ui.ReviewItem
 import com.example.movieismylife.viewmodel.MovieDetailViewModel
 import com.example.movieismylife.viewmodel.MovieListViewModel
+import com.example.movieismylife.viewmodel.MovieReviewViewModel
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
-fun MovieDetailPage(movieDetailViewModel: MovieDetailViewModel) {
+fun MovieDetailPage(
+    movieDetailViewModel: MovieDetailViewModel,
+    movieReviewViewModel: MovieReviewViewModel
+) {
     // Sample data
     val movieDetail = movieDetailViewModel._movieDetail.value
     val poster_path = "https://media.themoviedb.org/t/p/w220_and_h330_face/"
@@ -235,7 +243,7 @@ fun MovieDetailPage(movieDetailViewModel: MovieDetailViewModel) {
                     }
                 }
                 if(isMovieDetail) MovieDetailInfo(movieDetail)
-                else Review()
+                else Review(movieReviewViewModel)
             }
         }
     }
@@ -352,10 +360,16 @@ fun MovieDetailInfo(movieDetail : MovieDetailResponse?) {
 }
 
 @Composable
-fun Review() {
-    Column(
+fun Review(movieReviewViewModel: MovieReviewViewModel) {
+    val reviews by movieReviewViewModel.reviews.collectAsState()
 
-    ){
-
+    movieReviewViewModel.setSortOption(SortOption.LATEST)
+    LazyColumn(
+        modifier = Modifier.fillMaxSize(),
+        verticalArrangement = Arrangement.spacedBy(4.dp)
+    ) {
+        items(reviews) { review ->
+            ReviewItem(review = review)
+        }
     }
 }

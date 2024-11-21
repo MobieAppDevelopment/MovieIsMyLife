@@ -63,7 +63,10 @@ class MainActivity : ComponentActivity() {
 
                 // movieDetail api test
                 val movieDetailViewModel = viewModel<MovieDetailViewModel>() // 타입을 명시적으로 지정
-                MovieDetailPage(movieDetailViewModel = movieDetailViewModel)
+                MovieDetailPage(
+                    movieDetailViewModel = movieDetailViewModel,
+                    movieReviewViewModel = movieReview
+                    )
                 movieDetailViewModel.fetchMovieDetail()
             }
         }
