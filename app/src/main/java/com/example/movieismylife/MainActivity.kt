@@ -17,6 +17,7 @@ import androidx.compose.ui.tooling.preview.Preview
 import androidx.core.content.ContextCompat
 import androidx.lifecycle.viewmodel.compose.viewModel
 import com.example.movieismylife.ui.theme.MovieIsMyLifeTheme
+import com.example.movieismylife.viewmodel.MovieDetailViewModel
 import com.example.movieismylife.viewmodel.MovieListViewModel
 import com.example.movieismylife.viewmodel.MovieReviewViewModel
 
@@ -64,6 +65,13 @@ class MainActivity : ComponentActivity() {
 //                movieListViewModel.fetchSearchMovies("인생", page = 1)
 //                SearchResultScreen(movieListViewModel = movieListViewModel)
 
+//                 // movieDetail api test
+//                 val movieDetailViewModel = viewModel<MovieDetailViewModel>() // 타입을 명시적으로 지정
+//                 MovieDetailPage(
+//                     movieDetailViewModel = movieDetailViewModel,
+//                     movieReviewViewModel = movieReview
+//                     )
+//                 movieDetailViewModel.fetchMovieDetail()
             }
         }
     }

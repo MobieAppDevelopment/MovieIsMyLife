@@ -3,6 +3,7 @@ package com.example.movieismylife.response
 import com.example.movieismylife.BuildConfig.API_KEY
 import retrofit2.Call
 import retrofit2.http.GET
+import retrofit2.http.Path
 import retrofit2.http.Query
 
 interface ApiService {
@@ -27,4 +28,11 @@ interface ApiService {
         @Query("api_key") apiKey: String = API_KEY,
         @Query("language") language: String = "ko-KR",
     ): Call<GenreResponse>
+
+    @GET("movie/{movie_id}")
+    fun getDetailMovie(
+        @Path(value = "movie_id") movieId: Int,
+        @Query("api_key") apiKey: String = API_KEY,
+        @Query("language") language: String = "ko-KR",
+    ): Call<MovieDetailResponse>
 }
