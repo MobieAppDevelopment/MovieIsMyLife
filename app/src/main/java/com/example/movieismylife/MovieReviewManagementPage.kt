@@ -16,40 +16,24 @@ import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.lifecycle.viewmodel.compose.viewModel
+import androidx.navigation.NavController
 import com.example.movieismylife.enum.SortOption
 import com.example.movieismylife.ui.ReviewItem
 import com.example.movieismylife.viewmodel.MovieReviewViewModel
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
-fun MovieReviewManagementPage(viewModel: MovieReviewViewModel = viewModel()) {
-    val reviews by viewModel.reviews.collectAsState()
-    val sortOption by viewModel.sortOption.collectAsState()
-    val reviewType by viewModel.reviewType.collectAsState()
+fun MovieReviewManagementPage(
+    navController: NavController,
+    movieReviewViewModel: MovieReviewViewModel
+) {
+    val reviews by movieReviewViewModel.reviews.collectAsState()
+    val sortOption by movieReviewViewModel.sortOption.collectAsState()
+    val reviewType by movieReviewViewModel.reviewType.collectAsState()
 
-    Scaffold(modifier = Modifier.fillMaxSize(), topBar = {
-        TopAppBar(title = {
-            Text(
-                "MOVIE IS MY LIFE",
-                color = Color.White,
-                fontSize = 20.sp,
-                fontWeight = FontWeight.Bold
-            )
-        }, navigationIcon = {
-            IconButton(onClick = { /* TODO */ }) {
-                Icon(Icons.Default.Menu, contentDescription = "Menu", tint = Color.White)
-            }
-        }, actions = {
-            IconButton(onClick = { /* TODO */ }) {
-                Icon(
-                    Icons.Default.Search, contentDescription = "Search", tint = Color.White
-                )
-            }
-        }, colors = TopAppBarDefaults.topAppBarColors(
-            containerColor = Color.Black
-        )
-        )
-    }) { innerPadding ->
+    Scaffold(modifier = Modifier.fillMaxSize(),
+        bottomBar = { MovieBottomBar(navController=navController) }
+    ) { innerPadding ->
         Surface(
             modifier = Modifier
                 .fillMaxSize()
@@ -99,11 +83,11 @@ fun MovieReviewManagementPage(viewModel: MovieReviewViewModel = viewModel()) {
                         ExposedDropdownMenu(expanded = expanded,
                             onDismissRequest = { expanded = false }) {
                             DropdownMenuItem(text = { Text("최신순") }, onClick = {
-                                viewModel.setSortOption(SortOption.LATEST)
+                                movieReviewViewModel.setSortOption(SortOption.LATEST)
                                 expanded = false
                             })
                             DropdownMenuItem(text = { Text("별점순") }, onClick = {
-                                viewModel.setSortOption(SortOption.RATING)
+                                movieReviewViewModel.setSortOption(SortOption.RATING)
                                 expanded = false
                             })
                         }

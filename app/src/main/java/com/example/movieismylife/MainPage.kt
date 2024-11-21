@@ -9,11 +9,19 @@ import androidx.compose.foundation.lazy.LazyRow
 import androidx.compose.foundation.lazy.items
 import androidx.compose.foundation.lazy.itemsIndexed
 import androidx.compose.foundation.rememberScrollState
+import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.verticalScroll
+import androidx.compose.material.BottomNavigation
+import androidx.compose.material.BottomNavigationItem
 import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.filled.Check
+import androidx.compose.material.icons.filled.Edit
 import androidx.compose.material.icons.filled.Favorite
 import androidx.compose.material.icons.filled.FavoriteBorder
+import androidx.compose.material.icons.filled.Home
+import androidx.compose.material.icons.filled.Info
 import androidx.compose.material.icons.filled.Menu
+import androidx.compose.material.icons.filled.Person
 import androidx.compose.material.icons.filled.Search
 import androidx.compose.material3.*
 import androidx.compose.runtime.Composable
@@ -24,14 +32,21 @@ import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+import androidx.navigation.NavController
+import androidx.navigation.NavHostController
 import coil.compose.rememberAsyncImagePainter
 import com.example.movieismylife.R
 import com.example.movieismylife.model.Movies
+import com.example.movieismylife.viewmodel.MovieDetailViewModel
 import com.example.movieismylife.viewmodel.MovieListViewModel
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
-fun MainPage(movieListViewModel: MovieListViewModel) {
+fun MainPage(
+    navController: NavController,
+    movieListViewModel: MovieListViewModel,
+    movieDetailViewModel: MovieDetailViewModel
+) {
     // Sample data
     val popularMovies = movieListViewModel.popularMovieList.value
     val actionMovies = movieListViewModel.getGenreMovies(28)
@@ -50,21 +65,12 @@ fun MainPage(movieListViewModel: MovieListViewModel) {
                         fontWeight = FontWeight.Bold
                     )
                 },
-                navigationIcon = {
-                    IconButton(onClick = { /* TODO */ }) {
-                        Icon(Icons.Default.Menu, contentDescription = "Menu", tint = Color.White)
-                    }
-                },
-                actions = {
-                    IconButton(onClick = { /* TODO */ }) {
-                        Icon(Icons.Default.Search, contentDescription = "Search", tint = Color.White)
-                    }
-                },
                 colors = TopAppBarDefaults.topAppBarColors(
                     containerColor = Color.Black
                 )
             )
-        }
+        },
+        bottomBar = { MovieBottomBar(navController=navController) }
     ){ innerPadding ->
         Surface(
             modifier = Modifier
@@ -88,7 +94,14 @@ fun MainPage(movieListViewModel: MovieListViewModel) {
                     contentPadding = PaddingValues(horizontal = 16.dp)
                 ) {
                     itemsIndexed(popularMovies) { index, movie ->
-                        Top20MovieCard(movie = movie, rank = index)
+                        Top20MovieCard(
+                            movie = movie,
+                            rank = index,
+                            clickDetailEvent = {
+                                movieDetailViewModel.fetchMovieDetail(it.id)
+                                navController.navigate("detail")
+                            }
+                        )
                     }
                 }
 
@@ -105,7 +118,13 @@ fun MainPage(movieListViewModel: MovieListViewModel) {
                     contentPadding = PaddingValues(horizontal = 16.dp)
                 ) {
                     items(actionMovies) { movie ->
-                        SmallMovieCard(movie)
+                        SmallMovieCard(
+                            movie = movie,
+                            clickDetailEvent = {
+                                movieDetailViewModel.fetchMovieDetail(it.id)
+                                navController.navigate("detail")
+                            }
+                        )
                     }
                 }
 
@@ -122,7 +141,13 @@ fun MainPage(movieListViewModel: MovieListViewModel) {
                     contentPadding = PaddingValues(horizontal = 16.dp)
                 ) {
                     items(comedyMovies) { movie ->
-                        SmallMovieCard(movie)
+                        SmallMovieCard(
+                            movie = movie,
+                            clickDetailEvent = {
+                                movieDetailViewModel.fetchMovieDetail(it.id)
+                                navController.navigate("detail")
+                            }
+                        )
                     }
                 }
 
@@ -139,7 +164,13 @@ fun MainPage(movieListViewModel: MovieListViewModel) {
                     contentPadding = PaddingValues(horizontal = 16.dp)
                 ) {
                     items(familyMovies) { movie ->
-                        SmallMovieCard(movie)
+                        SmallMovieCard(
+                            movie = movie,
+                            clickDetailEvent = {
+                                movieDetailViewModel.fetchMovieDetail(it.id)
+                                navController.navigate("detail")
+                            }
+                        )
                     }
                 }
             }
@@ -150,14 +181,18 @@ fun MainPage(movieListViewModel: MovieListViewModel) {
 @SuppressLint("DefaultLocale")
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
-fun Top20MovieCard(movie: Movies, rank:Int) {
+fun Top20MovieCard(
+    movie: Movies,
+    rank:Int,
+    clickDetailEvent: (movie: Movies) -> Unit
+    ) {
     val poster_path = "https://media.themoviedb.org/t/p/w220_and_h330_face/"
     Card(
         modifier = Modifier
             .width(200.dp)
             .height(400.dp)
             .clickable {
-                println("clicked!!")
+                clickDetailEvent(movie)
             },
         elevation = CardDefaults.cardElevation(4.dp),
         colors = CardDefaults.cardColors(
@@ -212,14 +247,17 @@ fun Top20MovieCard(movie: Movies, rank:Int) {
 }
 
 @Composable
-fun SmallMovieCard(movie: Movies) {
+fun SmallMovieCard(
+    movie: Movies,
+    clickDetailEvent: (movie: Movies) -> Unit
+) {
     val poster_path = "https://media.themoviedb.org/t/p/w220_and_h330_face/"
     Card(
         modifier = Modifier
             .width(120.dp)
             .height(180.dp)
             .clickable {
-                println("clicked!!")
+                clickDetailEvent(movie)
             },
         elevation = CardDefaults.cardElevation(4.dp)
     ) {
@@ -251,6 +289,62 @@ fun RatingBar(rating: Double) {
                 tint = Color.White,
                 modifier = Modifier.size(16.dp)
             )
+        }
+    }
+}
+
+
+@Composable
+fun MovieBottomBar(navController: NavController) {
+    Row(
+        modifier = Modifier
+            .fillMaxWidth()
+            .height(60.dp)
+            .background(Color.DarkGray),
+        verticalAlignment = Alignment.CenterVertically,
+        horizontalArrangement = Arrangement.SpaceEvenly
+    ) {
+        Column(modifier = Modifier.weight(1f),
+            verticalArrangement = Arrangement.Center,
+            horizontalAlignment = Alignment.CenterHorizontally
+        ) {
+            IconButton(onClick = {
+                navController.navigate("main")
+            }) {
+                Icon(
+                    imageVector = Icons.Filled.Home,
+                    contentDescription = "Main",
+                    tint = Color.White
+                )
+            }
+        }
+        Column(modifier = Modifier.weight(1f),
+            verticalArrangement = Arrangement.Center,
+            horizontalAlignment = Alignment.CenterHorizontally
+        ) {
+            IconButton(onClick = {
+                navController.navigate("search")
+            }) {
+                Icon(
+                    imageVector = Icons.Filled.Search,
+                    contentDescription = "Search",
+                    tint = Color.White
+                )
+            }
+        }
+        Column(modifier = Modifier.weight(1f),
+            verticalArrangement = Arrangement.Center,
+            horizontalAlignment = Alignment.CenterHorizontally
+        ) {
+            IconButton(onClick = {
+                navController.navigate("mypage")
+            }) {
+                Icon(
+                    imageVector = Icons.Filled.Person,
+                    contentDescription = "MyPage",
+                    tint = Color.White
+                )
+            }
         }
     }
 }

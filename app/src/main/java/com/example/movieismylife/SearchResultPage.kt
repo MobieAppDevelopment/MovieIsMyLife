@@ -2,60 +2,101 @@ package com.example.movieismylife
 
 import android.annotation.SuppressLint
 import androidx.compose.foundation.Image
+import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.itemsIndexed
+import androidx.compose.foundation.shape.RoundedCornerShape
+import androidx.compose.foundation.text.KeyboardOptions
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Menu
 import androidx.compose.material.icons.filled.Search
 import androidx.compose.material3.*
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.remember
+import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.text.font.FontWeight
+import androidx.compose.ui.text.input.ImeAction
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+import androidx.navigation.NavController
 import coil.compose.rememberAsyncImagePainter
 import com.example.movieismylife.R
 import com.example.movieismylife.model.Movies
+import com.example.movieismylife.viewmodel.MovieDetailViewModel
 import com.example.movieismylife.viewmodel.MovieListViewModel
 
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
-fun SearchResultScreen(movieListViewModel: MovieListViewModel) {
+fun SearchResultPage(
+    navController: NavController,
+    movieListViewModel: MovieListViewModel,
+    movieDetailViewModel: MovieDetailViewModel
+) {
     // Sample data
     val searchResultMovies = movieListViewModel.searchMovieList.value
+    var searchtext by remember { mutableStateOf("") }
+
     Scaffold(
         modifier = Modifier.fillMaxSize(),
         topBar = {
-            TopAppBar(
-                title = {
-                    Text(
-                        "MOVIE IS MY LIFE",
-                        color = Color.White,
-                        fontSize = 20.sp,
-                        fontWeight = FontWeight.Bold
+            Column {
+                TopAppBar(
+                    title = {
+                        Text(
+                            text = "Search Result (${searchResultMovies.size})",
+                            color = Color.White,
+                            fontSize = 20.sp,
+                            fontWeight = FontWeight.Bold
+                        )
+                    },
+                    colors = TopAppBarDefaults.topAppBarColors(
+                        containerColor = Color.Black
                     )
-                },
-                navigationIcon = {
-                    IconButton(onClick = { /* TODO */ }) {
-                        Icon(Icons.Default.Menu, contentDescription = "Menu", tint = Color.White)
-                    }
-                },
-                actions = {
-                    IconButton(onClick = { /* TODO */ }) {
-                        Icon(Icons.Default.Search, contentDescription = "Search", tint = Color.White)
-                    }
-                },
-                colors = TopAppBarDefaults.topAppBarColors(
-                    containerColor = Color.Black
                 )
-            )
-        }
+                Row(
+                    verticalAlignment = Alignment.CenterVertically,
+                    modifier = Modifier
+                        .fillMaxWidth()
+                        .background(Color.Black)
+                        .padding(horizontal = 10.dp)
+                ){
+                    OutlinedTextField(
+                        value = searchtext,
+                        onValueChange = {searchtext = it},
+                        label = { Text("search") },
+                        modifier = Modifier.weight(8f),
+                        colors = OutlinedTextFieldDefaults.colors(Color.White),
+                        shape = RoundedCornerShape(16.dp), // 둥근 모서리 적용
+                        singleLine = true // 한 줄 입력만 가능
+                    )
+                    ElevatedButton(
+                        onClick = {
+                            movieListViewModel.fetchSearchMovies(
+                                query=searchtext, page=1
+                            )
+                        },
+                        colors = ButtonDefaults.elevatedButtonColors(containerColor = Color.DarkGray),
+                        modifier = Modifier.weight(2f)
+                    ) {
+                        Icon(
+                            imageVector = Icons.Default.Search,
+                            contentDescription = "Search",
+                            tint = Color.White
+                        )
+                    }
+                }
+            }
+        },
+        bottomBar = { MovieBottomBar(navController=navController) }
     ){ innerPadding ->
         Surface(
             modifier = Modifier
@@ -64,22 +105,19 @@ fun SearchResultScreen(movieListViewModel: MovieListViewModel) {
             color = Color.Black
         ) {
             Column {
-                // Top 10 Section
-                Text(
-                    text = "Search Result (${searchResultMovies.size})",
-                    color = Color.White,
-                    fontSize = 18.sp,
-                    fontWeight = FontWeight.Bold,
-                    modifier = Modifier.padding(16.dp)
-                )
-
                 LazyColumn(
                     modifier = Modifier.fillMaxWidth(),
                     contentPadding = PaddingValues(horizontal = 16.dp, vertical = 8.dp),
                     verticalArrangement = Arrangement.spacedBy(16.dp)
                 ) {
                     itemsIndexed(searchResultMovies) { index, movie ->
-                        SearchMovieCard(movie = movie, rank = index)
+                        SearchMovieCard(
+                            movie = movie,
+                            clickDetailEvent = {
+                                movieDetailViewModel.fetchMovieDetail(it.id)
+                                navController.navigate("detail")
+                            }
+                        )
                     }
                 }
             }
@@ -90,14 +128,17 @@ fun SearchResultScreen(movieListViewModel: MovieListViewModel) {
 @SuppressLint("DefaultLocale")
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
-fun SearchMovieCard(movie: Movies, rank:Int) {
+fun SearchMovieCard(
+    movie: Movies,
+    clickDetailEvent: (movie: Movies) -> Unit
+) {
     val poster_path = "https://media.themoviedb.org/t/p/w220_and_h330_face/"
     Row(
         modifier = Modifier
             .fillMaxWidth()
             .height(120.dp)
             .clickable {
-                println("clicked!!")
+                clickDetailEvent(movie)
             },
         horizontalArrangement = Arrangement.spacedBy(16.dp)
     ) {

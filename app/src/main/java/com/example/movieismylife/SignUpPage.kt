@@ -19,7 +19,7 @@ import androidx.compose.ui.unit.sp
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
-fun SignUpPage(){//onNavigateToLogin: () -> Unit, onSignUp: (String, String, String) -> Unit) {
+fun SignUpPage(backToLoginPage : () -> Unit){//onNavigateToLogin: () -> Unit, onSignUp: (String, String, String) -> Unit) {
     var name by remember { mutableStateOf("") }
     var email by remember { mutableStateOf("") }
     var password by remember { mutableStateOf("") }
@@ -106,7 +106,7 @@ fun SignUpPage(){//onNavigateToLogin: () -> Unit, onSignUp: (String, String, Str
             )
 
             Button(
-                onClick = { },//onSignUp(name, email, password) },
+                onClick = {  },//onSignUp(name, email, password) },
                 modifier = Modifier
                     .fillMaxWidth()
                     .height(50.dp),
@@ -120,7 +120,7 @@ fun SignUpPage(){//onNavigateToLogin: () -> Unit, onSignUp: (String, String, Str
             Text(
                 "Already have an account? Login",
                 color = Color.White,
-                modifier = Modifier.clickable(onClick = {})//onNavigateToLogin)
+                modifier = Modifier.clickable(onClick = {backToLoginPage()})//onNavigateToLogin)
             )
         }
     }

@@ -58,6 +58,7 @@ import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+import androidx.navigation.NavController
 import coil.compose.rememberAsyncImagePainter
 import com.example.movieismylife.enum.SortOption
 import com.example.movieismylife.response.MovieDetailResponse
@@ -69,10 +70,10 @@ import com.example.movieismylife.viewmodel.MovieReviewViewModel
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun MovieDetailPage(
+    navController: NavController,
     movieDetailViewModel: MovieDetailViewModel,
     movieReviewViewModel: MovieReviewViewModel
 ) {
-    movieDetailViewModel.fetchMovieDetail()
     // Sample data
     val movieDetail = movieDetailViewModel._movieDetail.value
     val poster_path = "https://media.themoviedb.org/t/p/w220_and_h330_face/"
@@ -81,31 +82,7 @@ fun MovieDetailPage(
 
     Scaffold(
         modifier = Modifier.fillMaxSize(),
-        topBar = {
-            CenterAlignedTopAppBar(
-                title = {
-                    Text(
-                        "MOVIE IS MY LIFE",
-                        color = Color.White,
-                        fontSize = 20.sp,
-                        fontWeight = FontWeight.Bold
-                    )
-                },
-                navigationIcon = {
-                    IconButton(onClick = { /* TODO */ }) {
-                        Icon(Icons.Default.Menu, contentDescription = "Menu", tint = Color.White)
-                    }
-                },
-                actions = {
-                    IconButton(onClick = { /* TODO */ }) {
-                        Icon(Icons.Default.Search, contentDescription = "Search", tint = Color.White)
-                    }
-                },
-                colors = TopAppBarDefaults.topAppBarColors(
-                    containerColor = Color.Black
-                )
-            )
-        }
+        bottomBar = { MovieBottomBar(navController=navController) }
     ){ innerPadding ->
         Surface(
             modifier = Modifier

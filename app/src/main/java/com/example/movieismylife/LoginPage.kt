@@ -5,8 +5,6 @@ import androidx.compose.foundation.text.KeyboardOptions
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Info
 import androidx.compose.material.icons.filled.Search
-//import androidx.compose.material.icons.filled.Visibility
-//import androidx.compose.material.icons.filled.VisibilityOff
 import androidx.compose.material3.*
 import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
@@ -17,10 +15,11 @@ import androidx.compose.ui.text.input.PasswordVisualTransformation
 import androidx.compose.ui.text.input.VisualTransformation
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+import androidx.navigation.NavController
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
-fun LoginPage(){//onNavigateToSignUp: () -> Unit, onLogin: (String, String) -> Unit) {
+fun LoginPage(navController: NavController){//onNavigateToSignUp: () -> Unit, onLogin: (String, String) -> Unit) {
     var email by remember { mutableStateOf("") }
     var password by remember { mutableStateOf("") }
     var passwordVisible by remember { mutableStateOf(false) }
@@ -89,7 +88,10 @@ fun LoginPage(){//onNavigateToSignUp: () -> Unit, onLogin: (String, String) -> U
             )
 
             Button(
-                onClick = { },//onLogin(email, password) },
+                onClick = {
+                    navController.navigate("main")
+//                    onLogin(email, password)
+                },
                 modifier = Modifier
                     .fillMaxWidth()
                     .height(50.dp),
@@ -103,7 +105,9 @@ fun LoginPage(){//onNavigateToSignUp: () -> Unit, onLogin: (String, String) -> U
             Text(
                 "Don't have an account? Sign Up",
                 color = Color.White,
-                modifier = Modifier.clickable(onClick = {})//onNavigateToSignUp)
+                modifier = Modifier.clickable(
+                    onClick = {navController.navigate("signup")}
+                )//onNavigateToSignUp)
             )
         }
     }
