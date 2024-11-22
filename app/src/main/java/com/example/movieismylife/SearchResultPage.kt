@@ -72,12 +72,22 @@ fun SearchResultPage(
                     OutlinedTextField(
                         value = searchtext,
                         onValueChange = {searchtext = it},
-                        label = { Text("search") },
-                        modifier = Modifier.weight(8f),
+                        placeholder = {
+                            Text(
+                                text="Search",
+                                color = Color.Gray,
+                                fontSize = 14.sp,
+                                ) }, // Placeholder 사용
+                        modifier = Modifier.weight(8f).height(52.dp),
                         colors = OutlinedTextFieldDefaults.colors(Color.White),
                         shape = RoundedCornerShape(16.dp), // 둥근 모서리 적용
-                        singleLine = true // 한 줄 입력만 가능
+                        singleLine = true, // 한 줄 입력만 가능
+                        textStyle = MaterialTheme.typography.bodySmall.copy( // 텍스트 스타일 설정
+                            fontSize = 14.sp, // 텍스트 크기 조정
+                            color = Color.White
+                        ),
                     )
+                    Spacer(modifier = Modifier.width(8.dp))
                     ElevatedButton(
                         onClick = {
                             movieListViewModel.fetchSearchMovies(
@@ -85,7 +95,7 @@ fun SearchResultPage(
                             )
                         },
                         colors = ButtonDefaults.elevatedButtonColors(containerColor = Color.DarkGray),
-                        modifier = Modifier.weight(2f)
+                        modifier = Modifier.weight(2f).height(52.dp),
                     ) {
                         Icon(
                             imageVector = Icons.Default.Search,
@@ -93,6 +103,7 @@ fun SearchResultPage(
                             tint = Color.White
                         )
                     }
+                    Spacer(modifier = Modifier.height(14.dp))
                 }
             }
         },
