@@ -106,7 +106,8 @@ dependencies {
     //Coroutine
     implementation("org.jetbrains.kotlinx:kotlinx-coroutines-android:1.3.9")
 
-    implementation(libs.androidx.runtime.livedata)
+    //implementation(libs.androidx.runtime.livedata)
+    implementation("androidx.compose.runtime:runtime-livedata:1.5.0")
 
     // coil(For image load)
     implementation("io.coil-kt:coil-compose:2.2.2")
