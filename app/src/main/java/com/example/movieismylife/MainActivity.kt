@@ -13,10 +13,6 @@ import androidx.activity.result.contract.ActivityResultContracts
 import androidx.compose.animation.ExperimentalAnimationApi
 import androidx.compose.animation.slideInHorizontally
 import androidx.compose.animation.slideOutHorizontally
-import androidx.compose.material3.Text
-import androidx.compose.runtime.Composable
-import androidx.compose.ui.Modifier
-import androidx.compose.ui.tooling.preview.Preview
 import androidx.core.content.ContextCompat
 import androidx.lifecycle.viewmodel.compose.viewModel
 import androidx.navigation.compose.NavHost
@@ -26,7 +22,7 @@ import com.example.movieismylife.ui.theme.MovieIsMyLifeTheme
 import com.example.movieismylife.viewmodel.MovieDetailViewModel
 import com.example.movieismylife.viewmodel.MovieListViewModel
 import com.example.movieismylife.viewmodel.MovieReviewViewModel
-import com.google.accompanist.navigation.animation.AnimatedNavHost
+import com.google.android.libraries.places.api.Places
 
 
 class MainActivity : ComponentActivity() {
@@ -51,6 +47,11 @@ class MainActivity : ComponentActivity() {
             showMovieRecommendationNotification(this)
         }
 
+        //앱 처음 사용시 GPS 허용 요청
+        requestLocationPermission()
+
+        Places.initialize(applicationContext, BuildConfig.MAPS_API_KEY)
+
         enableEdgeToEdge()
         setContent {
             @OptIn(ExperimentalAnimationApi::class)
@@ -64,7 +65,8 @@ class MainActivity : ComponentActivity() {
 
                 NavHost(
                     navController = navController,
-                    startDestination = "login",
+                    //startDestination = "login",
+                    startDestination = "map",
                 ){
                     composable(route = "login"){
                         LoginPage(navController=navController)
@@ -105,6 +107,14 @@ class MainActivity : ComponentActivity() {
                             navController=navController
                         )
                     }
+                    composable(route = "map",
+                        enterTransition = { slideInHorizontally() }, // 슬라이드 인 효과
+                        exitTransition = { slideOutHorizontally() }
+                    ){
+                        MovieTheaterMapScreen(navController=navController,
+                            onRequestLocationPermission = { requestLocationPermission() }
+                            )
+                    }
                 }
             }
         }
@@ -118,4 +128,12 @@ class MainActivity : ComponentActivity() {
             showMovieRecommendationNotification(this)
         }
     }
+
+    private fun requestLocationPermission() {
+        if (ContextCompat.checkSelfPermission(this, android.Manifest.permission.ACCESS_COARSE_LOCATION) != PackageManager.PERMISSION_GRANTED) {
+
+            requestPermissionLauncher.launch(android.Manifest.permission.ACCESS_COARSE_LOCATION)
+        }
+    }
+
 }
