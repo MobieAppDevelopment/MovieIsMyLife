@@ -10,22 +10,28 @@ import androidx.activity.ComponentActivity
 import androidx.activity.compose.setContent
 import androidx.activity.enableEdgeToEdge
 import androidx.activity.result.contract.ActivityResultContracts
-import androidx.compose.animation.ExperimentalAnimationApi
 import androidx.compose.animation.slideInHorizontally
 import androidx.compose.animation.slideOutHorizontally
 import androidx.core.content.ContextCompat
 import androidx.lifecycle.viewmodel.compose.viewModel
+import androidx.lifecycle.viewmodel.initializer
+import androidx.lifecycle.viewmodel.viewModelFactory
 import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
 import androidx.navigation.compose.rememberNavController
+import com.example.movieismylife.model.LocationDataManager
 import com.example.movieismylife.ui.theme.MovieIsMyLifeTheme
+import com.example.movieismylife.viewmodel.MapViewModel
 import com.example.movieismylife.viewmodel.MovieDetailViewModel
 import com.example.movieismylife.viewmodel.MovieListViewModel
 import com.example.movieismylife.viewmodel.MovieReviewViewModel
 import com.google.android.libraries.places.api.Places
+import com.google.android.libraries.places.api.net.PlacesClient
 
 
 class MainActivity : ComponentActivity() {
+    lateinit var placesClient: PlacesClient
+
     private val requestPermissionLauncher = registerForActivityResult(
         ActivityResultContracts.RequestPermission()
     ) { isGranted: Boolean ->
@@ -49,12 +55,13 @@ class MainActivity : ComponentActivity() {
 
         //앱 처음 사용시 GPS 허용 요청
         requestLocationPermission()
-
         Places.initialize(applicationContext, BuildConfig.MAPS_API_KEY)
+        placesClient = Places.createClient(this)
+
+        val locationDataManager = LocationDataManager(applicationContext)
 
         enableEdgeToEdge()
         setContent {
-            @OptIn(ExperimentalAnimationApi::class)
             MovieIsMyLifeTheme {
                 val navController = rememberNavController()
                 val movieListViewModel = viewModel<MovieListViewModel>() // 타입을 명시적으로 지정
@@ -63,10 +70,17 @@ class MainActivity : ComponentActivity() {
                 val movieDetailViewModel = viewModel<MovieDetailViewModel>() // 타입을 명시적으로 지정
                 val movieReviewViewModel = viewModel<MovieReviewViewModel>()
 
+                val mapViewModel: MapViewModel = viewModel(
+                    factory = viewModelFactory {
+                        initializer {
+                            MapViewModel(locationDataManager)
+                        }
+                    }
+                )
+
                 NavHost(
                     navController = navController,
-                    //startDestination = "login",
-                    startDestination = "map",
+                    startDestination = "login",
                 ){
                     composable(route = "login"){
                         LoginPage(navController=navController)
@@ -112,6 +126,7 @@ class MainActivity : ComponentActivity() {
                         exitTransition = { slideOutHorizontally() }
                     ){
                         MovieTheaterMapScreen(navController=navController,
+                            mapViewModel = mapViewModel,
                             onRequestLocationPermission = { requestLocationPermission() }
                             )
                     }
