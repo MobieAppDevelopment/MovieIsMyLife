@@ -12,6 +12,7 @@ import androidx.activity.enableEdgeToEdge
 import androidx.activity.result.contract.ActivityResultContracts
 import androidx.compose.animation.slideInHorizontally
 import androidx.compose.animation.slideOutHorizontally
+import androidx.compose.runtime.LaunchedEffect
 import androidx.core.content.ContextCompat
 import androidx.lifecycle.viewmodel.compose.viewModel
 import androidx.lifecycle.viewmodel.initializer
@@ -37,7 +38,6 @@ class MainActivity : ComponentActivity() {
     ) { isGranted: Boolean ->
         if (isGranted) {
             createNotificationChannel(this)
-            showMovieRecommendationNotification(this)
         } else {
             Log.d("Notification", "Notification permission denied")
         }
@@ -45,15 +45,13 @@ class MainActivity : ComponentActivity() {
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
-        // 앱 처음 사용시 알림 허용 요청
+
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.TIRAMISU) {
             requestNotificationPermission()
         } else {
             createNotificationChannel(this)
-            showMovieRecommendationNotification(this)
         }
 
-        //앱 처음 사용시 GPS 허용 요청
         requestLocationPermission()
         Places.initialize(applicationContext, BuildConfig.MAPS_API_KEY)
         placesClient = Places.createClient(this)
@@ -64,10 +62,8 @@ class MainActivity : ComponentActivity() {
         setContent {
             MovieIsMyLifeTheme {
                 val navController = rememberNavController()
-                val movieListViewModel = viewModel<MovieListViewModel>() // 타입을 명시적으로 지정
-                movieListViewModel.fetchPopularMovies()
-                movieListViewModel.fetchGenres()
-                val movieDetailViewModel = viewModel<MovieDetailViewModel>() // 타입을 명시적으로 지정
+                val movieListViewModel = viewModel<MovieListViewModel>()
+                val movieDetailViewModel = viewModel<MovieDetailViewModel>()
                 val movieReviewViewModel = viewModel<MovieReviewViewModel>()
 
                 val mapViewModel: MapViewModel = viewModel(
@@ -77,6 +73,24 @@ class MainActivity : ComponentActivity() {
                         }
                     }
                 )
+
+                // Fetch popular movies only once
+                LaunchedEffect(Unit) {
+                    movieListViewModel.fetchPopularMovies()
+                    movieListViewModel.fetchGenres()
+                }
+
+                // Observe popular movies and show notification when ready
+                LaunchedEffect(movieListViewModel.isPopularMoviesFetched) {
+                    movieListViewModel.isPopularMoviesFetched.collect { isFetched ->
+                        if (isFetched) {
+                            val randomMovie = movieListViewModel.getRandomMovie()
+                            if (randomMovie != null) {
+                                showMovieRecommendationNotification(this@MainActivity, randomMovie)
+                            }
+                        }
+                    }
+                }
 
                 NavHost(
                     navController = navController,
@@ -94,7 +108,7 @@ class MainActivity : ComponentActivity() {
                     }
                     composable(
                         route = "main",
-                        enterTransition = { slideInHorizontally() }, // 슬라이드 인 효과
+                        enterTransition = { slideInHorizontally() },
                         exitTransition = { slideOutHorizontally() }
                     ){
                         MainPage(
@@ -112,7 +126,7 @@ class MainActivity : ComponentActivity() {
                     }
                     composable(
                         route = "search",
-                        enterTransition = { slideInHorizontally() }, // 슬라이드 인 효과
+                        enterTransition = { slideInHorizontally() },
                         exitTransition = { slideOutHorizontally() }
                     ){
                         SearchResultPage(
@@ -122,13 +136,14 @@ class MainActivity : ComponentActivity() {
                         )
                     }
                     composable(route = "map",
-                        enterTransition = { slideInHorizontally() }, // 슬라이드 인 효과
+                        enterTransition = { slideInHorizontally() },
                         exitTransition = { slideOutHorizontally() }
                     ){
-                        MovieTheaterMapScreen(navController=navController,
+                        MovieTheaterMapScreen(
+                            navController=navController,
                             mapViewModel = mapViewModel,
                             onRequestLocationPermission = { requestLocationPermission() }
-                            )
+                        )
                     }
                 }
             }
@@ -140,15 +155,12 @@ class MainActivity : ComponentActivity() {
             requestPermissionLauncher.launch(android.Manifest.permission.POST_NOTIFICATIONS)
         } else {
             createNotificationChannel(this)
-            showMovieRecommendationNotification(this)
         }
     }
 
     private fun requestLocationPermission() {
         if (ContextCompat.checkSelfPermission(this, android.Manifest.permission.ACCESS_COARSE_LOCATION) != PackageManager.PERMISSION_GRANTED) {
-
             requestPermissionLauncher.launch(android.Manifest.permission.ACCESS_COARSE_LOCATION)
         }
     }
-
 }

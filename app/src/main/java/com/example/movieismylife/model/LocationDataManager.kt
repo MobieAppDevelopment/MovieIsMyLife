@@ -28,12 +28,15 @@ import kotlin.math.cos
 import kotlin.math.sqrt
 
 class LocationDataManager(private val context: Context) {
+    //유저의 현재 위치
     private val _userLocation = MutableStateFlow<LatLng?>(null)
     val userLocation: StateFlow<LatLng?> = _userLocation
 
+    //유저 기준 근처의 영화관
     private val _nearbyTheaters = MutableStateFlow<List<Place>>(emptyList())
     val nearbyTheaters: StateFlow<List<Place>> = _nearbyTheaters
 
+    //지도 API 로딩중?
     private val _isLoading = MutableStateFlow(false)
     val isLoading: StateFlow<Boolean> = _isLoading
 
@@ -83,7 +86,7 @@ class LocationDataManager(private val context: Context) {
                 val theaters = searchNearbyTheaters(location)
                 _nearbyTheaters.value = theaters
             } catch (e: Exception) {
-                Log.e("LocationDataManager", "Error fetching nearby theaters", e)
+                Log.e("LocationDataManager", "근처 영화관 탐색 중 에러가 발생 했습니다.", e)
             } finally {
                 _isLoading.value = false
             }
@@ -111,7 +114,7 @@ class LocationDataManager(private val context: Context) {
 
         return try {
             val response = placesClient.findAutocompletePredictions(request).await()
-            Log.d("MapViewModel", "Found ${response.autocompletePredictions.size} predictions for query '$query'")
+            Log.d("MapViewModel", "찾은 장소 개수: ${response.autocompletePredictions.size} 쿼리로 준 단어: '$query'")
             response.autocompletePredictions
                 .filter { prediction ->
                     prediction.placeTypes.any { it == Place.Type.MOVIE_THEATER }
@@ -120,7 +123,7 @@ class LocationDataManager(private val context: Context) {
                     getPlaceDetails(prediction)
                 }
         } catch (e: Exception) {
-            Log.e("MapViewModel", "Error searching for nearby theaters with query '$query'", e)
+            Log.e("MapViewModel", "다음 쿼리로 호출하던 도중 예기치 못한 에러가 발생했습니다.: '$query'", e)
             emptyList()
         }
     }
@@ -133,7 +136,7 @@ class LocationDataManager(private val context: Context) {
             val response = placesClient.fetchPlace(request).await()
             response.place
         } catch (e: Exception) {
-            Log.e("MapViewModel", "Error fetching place details", e)
+            Log.e("MapViewModel", "장소 세부사항을 패치하던중 에러가 발생했습니다.", e)
             null
         }
     }
@@ -142,8 +145,8 @@ class LocationDataManager(private val context: Context) {
         val distanceFromCenterToCorner = radiusInMeters * sqrt(2.0)
         val latRadian = Math.toRadians(center.latitude)
 
-        val degLatKm = 110.0
-        val degLongKm = 110.0 * cos(latRadian)
+        val degLatKm = 100.0
+        val degLongKm = 100.0 * cos(latRadian)
         val deltaLat = distanceFromCenterToCorner / 1000.0 / degLatKm
         val deltaLong = distanceFromCenterToCorner / 1000.0 / degLongKm
 

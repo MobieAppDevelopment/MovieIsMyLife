@@ -1,16 +1,16 @@
 package com.example.movieismylife.viewmodel
 
-import android.graphics.pdf.PdfDocument.Page
 import android.util.Log
 import androidx.compose.runtime.State
 import androidx.compose.runtime.mutableStateOf
-import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
-import com.example.movieismylife.response.MovieResponse
 import com.example.movieismylife.model.Movies
 import com.example.movieismylife.response.ApiService
 import com.example.movieismylife.response.GenreResponse
+import com.example.movieismylife.response.MovieResponse
+import kotlinx.coroutines.flow.MutableStateFlow
+import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.launch
 import retrofit2.Call
 import retrofit2.Callback
@@ -21,6 +21,9 @@ import retrofit2.converter.gson.GsonConverterFactory
 class MovieListViewModel : ViewModel() {
     private val _popularMovieList = mutableStateOf<List<Movies>>(mutableListOf<Movies>())
     val popularMovieList : State<List<Movies>> = _popularMovieList
+
+    private val _isPopularMoviesFetched = MutableStateFlow(false)
+    val isPopularMoviesFetched: StateFlow<Boolean> = _isPopularMoviesFetched
 
     private val _searchMovieList = mutableStateOf<List<Movies>>(mutableListOf<Movies>())
     val searchMovieList : State<List<Movies>> = _searchMovieList
@@ -39,8 +42,13 @@ class MovieListViewModel : ViewModel() {
     // 어떤 주소를 입력했다!
     private val api = retrofit.create(ApiService::class.java)
 
-    // 인기 있는 영화 20개를 popularMovieList에 가져온다
+// 인기 있는 영화 20개를 popularMovieList에 가져온다
     fun fetchPopularMovies() {
+        if (_isPopularMoviesFetched.value) {
+            Log.d("MovieListViewModel", "Popular movies already fetched, skipping.")
+            return // Don't fetch if already fetched
+        }
+
         viewModelScope.launch {
             try {
                 api.getPopularMovies().enqueue(object : Callback<MovieResponse> {
@@ -51,30 +59,29 @@ class MovieListViewModel : ViewModel() {
                         if (response.isSuccessful) {
                             val data = response.body()
                             val movies = data?.results
-                            Log.d("Debugging", "!!!${movies}")
                             if (!movies.isNullOrEmpty()) {
-                                movies.forEach {
-                                    _popularMovieList.value += it
-                                    Log.d("Debugging", "@@@@${it}")
-                                    Log.d("movieList", "@@@@$$$$####${popularMovieList.value[0].adult}")
+                                _popularMovieList.value = movies
+                                _isPopularMoviesFetched.value = true
+
+                                // Log the fetched movies
+                                Log.d("MovieListViewModel", "Fetched ${movies.size} popular movies:")
+                                movies.forEachIndexed { index, movie ->
+                                    Log.d("MovieListViewModel", "${index + 1}. ${movie.title} (ID: ${movie.id})")
                                 }
-                            }
-                            response.body()?.results?.forEach { movie ->
-                                Log.d("MovieTitle", "Movie: ${movie.title}")
+                            } else {
+                                Log.w("MovieListViewModel", "영화 리스트가 비어있습니다.")
                             }
                         } else {
-                            // Handle error
+                            Log.e("MovieListViewModel", "populur 영화 api를 호출하는 과정에서 오류가 발생했습니다. ${response.code()} ${response.message()}")
                         }
-                        println(popularMovieList.value.size)
                     }
 
                     override fun onFailure(call: Call<MovieResponse>, t: Throwable) {
-                        // Handle error
+                        Log.e("MovieListViewModel", "인기있는 영화를 가져오는 것을 실패했습니다.", t)
                     }
                 })
             } catch (e: Exception) {
-                println("오류가 발생한 것 같아요~~")
-                e.printStackTrace()
+                Log.e("MovieListViewModel", "인기있는 영화를 가져오던 중에 예기치 못한 에러가 발생했습니다.", e)
             }
         }
     }
@@ -164,6 +171,11 @@ class MovieListViewModel : ViewModel() {
             genre_id in (it.genreIds ?: listOf<Int>())
         }.forEach{genreMovieList.add(it)}
         return genreMovieList
+    }
+
+    // 랜덤한 영화 하나를 가져오는 함수
+    fun getRandomMovie(): Movies? {
+        return popularMovieList.value.randomOrNull()
     }
 
 }

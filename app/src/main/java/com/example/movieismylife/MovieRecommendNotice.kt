@@ -2,11 +2,14 @@ package com.example.movieismylife
 
 import android.app.NotificationChannel
 import android.app.NotificationManager
+import android.app.PendingIntent
 import android.content.Context
+import android.content.Intent
 import android.os.Build
 import android.util.Log
 import androidx.core.app.NotificationCompat
 import androidx.core.content.ContextCompat
+import com.example.movieismylife.model.Movies
 
 const val CHANNEL_ID = "movie_recommendation_channel"
 
@@ -25,15 +28,25 @@ fun createNotificationChannel(context: Context) {
     }
 }
 
-fun showMovieRecommendationNotification(context: Context) {
-    //Todo: RandomMovie 선정하는 로직 생성 필요. (영화 10개 정도 List 만든 다음 Random())으로 하나 가져오면 될듯
-    val randomMovie = "유령신부"
+// 영화 추천 알림
+fun showMovieRecommendationNotification(context: Context, movie: Movies) {
     val builder = NotificationCompat.Builder(context, CHANNEL_ID)
         .setSmallIcon(R.drawable.ic_movie)
         .setContentTitle("영화 추천")
-        .setContentText("오늘의 추천 영화: $randomMovie")
+        .setContentText("오늘의 추천 영화: ${movie.title}")
+        .setStyle(
+            NotificationCompat.BigTextStyle()
+            .bigText("${movie.title}\n\n${movie.overview}"))
         .setPriority(NotificationCompat.PRIORITY_DEFAULT)
         .setAutoCancel(true)
+
+    val intent = Intent(context, MainActivity::class.java).apply {
+        flags = Intent.FLAG_ACTIVITY_NEW_TASK or Intent.FLAG_ACTIVITY_CLEAR_TASK
+    }
+
+    val pendingIntent: PendingIntent = PendingIntent.getActivity(context, 0, intent, PendingIntent.FLAG_IMMUTABLE)
+
+    builder.setContentIntent(pendingIntent)
 
     val notificationManager = ContextCompat.getSystemService(
         context,
@@ -41,5 +54,5 @@ fun showMovieRecommendationNotification(context: Context) {
     )
 
     notificationManager?.notify(1, builder.build())
-    Log.d("Notification", "Notification shown")
+    Log.d("Notification", "알림에 나온 영화 제목: ${movie.title}")
 }
