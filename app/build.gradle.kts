@@ -32,6 +32,8 @@ android {
 
         buildConfigField("String", "API_KEY", getApiKey("api_key"))
         buildConfigField("String", "MAPS_API_KEY",getApiKey("MAPS_API_KEY"))
+        resValue ("string", "maps_api_key", "${project.findProperty("MAPS_API_KEY".toString()) ?: "fail"}")
+
         multiDexEnabled = true
     }
 
