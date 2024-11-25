@@ -1,5 +1,8 @@
 *.iml
 .gradle
+/.idea/codeStyles
+/.idea/inspectionProfiles
+/.idea/runConfigurations.xml
 /local.properties
 /.idea/caches
 /.idea/libraries
