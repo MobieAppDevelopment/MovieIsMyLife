@@ -19,3 +19,4 @@ local.properties
 
 /src/main/res/values/apiKey.xml
 **/apiKey.xml
+/.idea/codeStyles/
