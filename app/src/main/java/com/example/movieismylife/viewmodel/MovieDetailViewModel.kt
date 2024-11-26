@@ -40,10 +40,10 @@ class MovieDetailViewModel : ViewModel() {
     private val api = retrofit.create(ApiService::class.java)
 
     // 인기 있는 영화 20개를 popularMovieList에 가져온다
-    fun fetchMovieDetail() {
+    fun fetchMovieDetail(movieid:Int = 912649) {
         viewModelScope.launch {
             try {
-                api.getDetailMovie(912649).enqueue(object : Callback<MovieDetailResponse> {
+                api.getDetailMovie(movieid).enqueue(object : Callback<MovieDetailResponse> {
                     override fun onResponse(
                         call: Call<MovieDetailResponse>,
                         response: Response<MovieDetailResponse>

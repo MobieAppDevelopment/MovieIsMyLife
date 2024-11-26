@@ -10,26 +10,34 @@ import androidx.activity.ComponentActivity
 import androidx.activity.compose.setContent
 import androidx.activity.enableEdgeToEdge
 import androidx.activity.result.contract.ActivityResultContracts
-import androidx.compose.material3.Text
-import androidx.compose.runtime.Composable
-import androidx.compose.ui.Modifier
-import androidx.compose.ui.tooling.preview.Preview
+import androidx.compose.animation.slideInHorizontally
+import androidx.compose.animation.slideOutHorizontally
+import androidx.compose.runtime.LaunchedEffect
 import androidx.core.content.ContextCompat
 import androidx.lifecycle.viewmodel.compose.viewModel
+import androidx.lifecycle.viewmodel.initializer
+import androidx.lifecycle.viewmodel.viewModelFactory
+import androidx.navigation.compose.NavHost
+import androidx.navigation.compose.composable
+import androidx.navigation.compose.rememberNavController
+import com.example.movieismylife.model.LocationDataManager
 import com.example.movieismylife.ui.theme.MovieIsMyLifeTheme
+import com.example.movieismylife.viewmodel.MapViewModel
 import com.example.movieismylife.viewmodel.MovieDetailViewModel
 import com.example.movieismylife.viewmodel.MovieListViewModel
 import com.example.movieismylife.viewmodel.MovieReviewViewModel
+import com.google.android.libraries.places.api.Places
+import com.google.android.libraries.places.api.net.PlacesClient
 
 
 class MainActivity : ComponentActivity() {
+    lateinit var placesClient: PlacesClient
 
     private val requestPermissionLauncher = registerForActivityResult(
         ActivityResultContracts.RequestPermission()
     ) { isGranted: Boolean ->
         if (isGranted) {
             createNotificationChannel(this)
-            showMovieRecommendationNotification(this)
         } else {
             Log.d("Notification", "Notification permission denied")
         }
@@ -37,41 +45,107 @@ class MainActivity : ComponentActivity() {
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
-        // 앱 처음 사용시 알림 허용 요청
+
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.TIRAMISU) {
             requestNotificationPermission()
         } else {
             createNotificationChannel(this)
-            showMovieRecommendationNotification(this)
         }
+
+        requestLocationPermission()
+        Places.initialize(applicationContext, BuildConfig.MAPS_API_KEY)
+        placesClient = Places.createClient(this)
+
+        val locationDataManager = LocationDataManager(applicationContext)
 
         enableEdgeToEdge()
         setContent {
             MovieIsMyLifeTheme {
-                val movieListViewModel = viewModel<MovieListViewModel>() // 타입을 명시적으로 지정
-                movieListViewModel.fetchPopularMovies()
-                movieListViewModel.fetchGenres()
+                val navController = rememberNavController()
+                val movieListViewModel = viewModel<MovieListViewModel>()
+                val movieDetailViewModel = viewModel<MovieDetailViewModel>()
+                val movieReviewViewModel = viewModel<MovieReviewViewModel>()
 
-                //MainPage(movieListViewModel = movieListViewModel)
+                val mapViewModel: MapViewModel = viewModel(
+                    factory = viewModelFactory {
+                        initializer {
+                            MapViewModel(locationDataManager)
+                        }
+                    }
+                )
 
-                val movieReview = viewModel<MovieReviewViewModel>()
+                // Fetch popular movies only once
+                LaunchedEffect(Unit) {
+                    movieListViewModel.fetchPopularMovies()
+                    movieListViewModel.fetchGenres()
+                }
 
-                //MovieReviewManagementPage(viewModel = movieReview)
-                //LoginPage()
-                SignUpPage()
+                // Observe popular movies and show notification when ready
+                LaunchedEffect(movieListViewModel.isPopularMoviesFetched) {
+                    movieListViewModel.isPopularMoviesFetched.collect { isFetched ->
+                        if (isFetched) {
+                            val randomMovie = movieListViewModel.getRandomMovie()
+                            if (randomMovie != null) {
+                                showMovieRecommendationNotification(this@MainActivity, randomMovie)
+                            }
+                        }
+                    }
+                }
 
-                // 임의로 일단 Search를 적용한 것
-                // 나중에 search button에 navigation과 함께 적용해야 함
-//                movieListViewModel.fetchSearchMovies("인생", page = 1)
-//                SearchResultScreen(movieListViewModel = movieListViewModel)
-
-//                 // movieDetail api test
-//                 val movieDetailViewModel = viewModel<MovieDetailViewModel>() // 타입을 명시적으로 지정
-//                 MovieDetailPage(
-//                     movieDetailViewModel = movieDetailViewModel,
-//                     movieReviewViewModel = movieReview
-//                     )
-//                 movieDetailViewModel.fetchMovieDetail()
+                NavHost(
+                    navController = navController,
+                    startDestination = "login",
+                ){
+                    composable(route = "login"){
+                        LoginPage(navController=navController)
+                    }
+                    composable(route = "signup"){
+                        SignUpPage(
+                            backToLoginPage = {
+                                navController.navigateUp()
+                            }
+                        )
+                    }
+                    composable(
+                        route = "main",
+                        enterTransition = { slideInHorizontally() },
+                        exitTransition = { slideOutHorizontally() }
+                    ){
+                        MainPage(
+                            movieListViewModel = movieListViewModel,
+                            movieDetailViewModel = movieDetailViewModel,
+                            navController=navController,
+                        )
+                    }
+                    composable(route = "detail"){
+                        MovieDetailPage(
+                            navController=navController,
+                            movieDetailViewModel=movieDetailViewModel,
+                            movieReviewViewModel=movieReviewViewModel
+                        )
+                    }
+                    composable(
+                        route = "search",
+                        enterTransition = { slideInHorizontally() },
+                        exitTransition = { slideOutHorizontally() }
+                    ){
+                        SearchResultPage(
+                            movieListViewModel = movieListViewModel,
+                            movieDetailViewModel = movieDetailViewModel,
+                            navController=navController
+                        )
+                    }
+                    composable(route = "map",
+                        enterTransition = { slideInHorizontally() },
+                        exitTransition = { slideOutHorizontally() }
+                    ){
+                        MovieTheaterMapScreen(
+                            navController=navController,
+                            mapViewModel = mapViewModel,
+                            onRequestLocationPermission = { requestLocationPermission() }
+                        )
+                    }
+                }
             }
         }
     }
@@ -81,25 +155,12 @@ class MainActivity : ComponentActivity() {
             requestPermissionLauncher.launch(android.Manifest.permission.POST_NOTIFICATIONS)
         } else {
             createNotificationChannel(this)
-            showMovieRecommendationNotification(this)
+        }
+    }
+
+    private fun requestLocationPermission() {
+        if (ContextCompat.checkSelfPermission(this, android.Manifest.permission.ACCESS_COARSE_LOCATION) != PackageManager.PERMISSION_GRANTED) {
+            requestPermissionLauncher.launch(android.Manifest.permission.ACCESS_COARSE_LOCATION)
         }
     }
 }
-
-
-
-//@Composable
-//fun Greeting(name: String, modifier: Modifier = Modifier) {
-//    Text(
-//        text = "Hello $name!",
-//        modifier = modifier
-//    )
-//}
-//
-//@Preview(showBackground = true)
-//@Composable
-//fun GreetingPreview() {
-//    MovieIsMyLifeTheme {
-//        Greeting("Android")
-//    }
-//}

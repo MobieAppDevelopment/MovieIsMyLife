@@ -1,5 +1,8 @@
 *.iml
 .gradle
+/.idea/codeStyles
+/.idea/inspectionProfiles
+/.idea/runConfigurations.xml
 /local.properties
 /.idea/caches
 /.idea/libraries
@@ -13,3 +16,8 @@
 .externalNativeBuild
 .cxx
 local.properties
+
+/src/main/res/values/apiKey.xml
+**/apiKey.xml
+/.idea/codeStyles/
+/.idea/

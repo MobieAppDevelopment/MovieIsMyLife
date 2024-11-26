@@ -31,6 +31,10 @@ android {
         }
 
         buildConfigField("String", "API_KEY", getApiKey("api_key"))
+        buildConfigField("String", "MAPS_API_KEY",getApiKey("MAPS_API_KEY"))
+        resValue ("string", "maps_api_key", "${project.findProperty("MAPS_API_KEY".toString()) ?: "fail"}")
+
+        multiDexEnabled = true
     }
 
     buildTypes {
@@ -68,6 +72,8 @@ fun getApiKey(propertyKey: String): String {
 }
 
 dependencies {
+    implementation("androidx.appcompat:appcompat:1.4.2")
+    implementation("androidx.appcompat:appcompat-resources:1.4.2")
 
     implementation(libs.androidx.core.ktx)
     implementation(libs.androidx.lifecycle.runtime.ktx)
@@ -105,8 +111,10 @@ dependencies {
 
     //Coroutine
     implementation("org.jetbrains.kotlinx:kotlinx-coroutines-android:1.3.9")
+    implementation("org.jetbrains.kotlinx:kotlinx-coroutines-play-services:1.6.4")
 
-    implementation(libs.androidx.runtime.livedata)
+    //implementation(libs.androidx.runtime.livedata)
+    implementation("androidx.compose.runtime:runtime-livedata:1.5.0")
 
     // coil(For image load)
     implementation("io.coil-kt:coil-compose:2.2.2")
@@ -114,4 +122,21 @@ dependencies {
     // icon
     implementation("androidx.compose.material:material:1.5.0")
     implementation("androidx.compose.material3:material3:1.0.0")
+
+    implementation("com.google.accompanist:accompanist-navigation-animation:0.36.0")
+
+    //Google Map Api
+    implementation("com.google.android.gms:play-services-maps:19.0.0")
+    implementation ("com.google.maps.android:maps-compose:2.11.4")
+    implementation("com.google.android.gms:play-services-location:21.3.0")
+    implementation (libs.places)
+
+
+}
+
+configurations.all {
+    resolutionStrategy {
+        force("androidx.appcompat:appcompat:1.4.2")
+        force("androidx.appcompat:appcompat-resources:1.4.2")
+    }
 }
