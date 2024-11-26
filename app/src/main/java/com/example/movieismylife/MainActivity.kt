@@ -94,7 +94,7 @@ class MainActivity : ComponentActivity() {
 
                 NavHost(
                     navController = navController,
-                    startDestination = "reviewWrite",
+                    startDestination = "MyPage",
                 ){
                     composable(route = "login"){
                         LoginPage(navController=navController)

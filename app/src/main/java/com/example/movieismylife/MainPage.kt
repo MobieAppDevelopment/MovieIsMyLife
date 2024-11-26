@@ -362,7 +362,7 @@ fun MovieBottomBar(navController: NavController) {
             horizontalAlignment = Alignment.CenterHorizontally
         ) {
             IconButton(onClick = {
-                navController.navigate("mypage")
+                navController.navigate("myPage")
             }) {
                 Icon(
                     imageVector = Icons.Filled.Person,

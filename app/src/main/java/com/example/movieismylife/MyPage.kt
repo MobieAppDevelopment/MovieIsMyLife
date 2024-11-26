@@ -4,6 +4,12 @@ import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.shape.CircleShape
+import androidx.compose.foundation.shape.RoundedCornerShape
+import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.filled.Home
+import androidx.compose.material.icons.filled.LocationOn
+import androidx.compose.material.icons.filled.Person
+import androidx.compose.material.icons.filled.Search
 import androidx.compose.material3.*
 import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
@@ -17,32 +23,37 @@ import androidx.navigation.NavController
 
 @Composable
 fun MyPage(navController: NavController) {
-    Surface(
+    Scaffold(
         modifier = Modifier.fillMaxSize(),
-        color = Color(0xFF1A1B1E)
-    ) {
-        Column(
-            modifier = Modifier
-                .fillMaxSize()
-                .padding(16.dp)
+        bottomBar = { MovieBottomBar(navController=navController) }
+    ) { innerPadding ->
+        Surface(
+            modifier = Modifier.fillMaxSize().padding(innerPadding),
+            color = Color(0xFF1A1B1E)
         ) {
-            // Profile Section (Same as before)
-            ProfileSection()
+            Column(
+                modifier = Modifier
+                    .fillMaxSize()
+                    .padding(16.dp)
+            ) {
+                // Profile Section (Same as before)
+                ProfileSection()
 
-            // Stats Section (Same as before)
-            StatsSection()
+                // Stats Section (Same as before)
+                StatsSection()
 
-            // Review Sections (Now with click handlers)
-            ReviewSection(
-                title = "작성한 리뷰",
-                count = "0",
-                onClick = { navController.navigate("writtenReviews") }
-            )
-            ReviewSection(
-                title = "좋아요한 리뷰",
-                count = "0",
-                onClick = { navController.navigate("likedReviews") }
-            )
+                // Review Sections (Now with click handlers)
+                ReviewSection(
+                    title = "작성한 리뷰",
+                    count = "0",
+                    onClick = { navController.navigate("writtenReviews") }
+                )
+                ReviewSection(
+                    title = "좋아요한 리뷰",
+                    count = "0",
+                    onClick = { navController.navigate("likedReviews") }
+                )
+            }
         }
     }
 }
