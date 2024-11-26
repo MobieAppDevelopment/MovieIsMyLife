@@ -94,7 +94,7 @@ class MainActivity : ComponentActivity() {
 
                 NavHost(
                     navController = navController,
-                    startDestination = "reviewPage",
+                    startDestination = "reviewWrite",
                 ){
                     composable(route = "login"){
                         LoginPage(navController=navController)
@@ -160,6 +160,16 @@ class MainActivity : ComponentActivity() {
                         exitTransition = { slideOutHorizontally() }
                     ){
                         ReviewDetailPage(
+                            navController=navController,
+//                            mapViewModel = mapViewModel,
+//                            onRequestLocationPermission = { requestLocationPermission() }
+                        )
+                    }
+                    composable(route = "reviewWrite",
+                        enterTransition = { slideInHorizontally() },
+                        exitTransition = { slideOutHorizontally() }
+                    ){
+                        ReviewWritePage(
                             navController=navController,
 //                            mapViewModel = mapViewModel,
 //                            onRequestLocationPermission = { requestLocationPermission() }
