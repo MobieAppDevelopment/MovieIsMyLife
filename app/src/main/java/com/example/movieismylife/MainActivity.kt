@@ -94,7 +94,7 @@ class MainActivity : ComponentActivity() {
 
                 NavHost(
                     navController = navController,
-                    startDestination = "login",
+                    startDestination = "reviewPage",
                 ){
                     composable(route = "login"){
                         LoginPage(navController=navController)
@@ -143,6 +143,26 @@ class MainActivity : ComponentActivity() {
                             navController=navController,
                             mapViewModel = mapViewModel,
                             onRequestLocationPermission = { requestLocationPermission() }
+                        )
+                    }
+                    composable(route = "myPage",
+                        enterTransition = { slideInHorizontally() },
+                        exitTransition = { slideOutHorizontally() }
+                    ){
+                        MyPage(
+                            navController=navController,
+//                            mapViewModel = mapViewModel,
+//                            onRequestLocationPermission = { requestLocationPermission() }
+                        )
+                    }
+                    composable(route = "reviewPage",
+                        enterTransition = { slideInHorizontally() },
+                        exitTransition = { slideOutHorizontally() }
+                    ){
+                        ReviewDetailPage(
+                            navController=navController,
+//                            mapViewModel = mapViewModel,
+//                            onRequestLocationPermission = { requestLocationPermission() }
                         )
                     }
                 }
