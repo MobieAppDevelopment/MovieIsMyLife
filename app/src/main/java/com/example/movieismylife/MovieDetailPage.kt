@@ -66,13 +66,15 @@ import com.example.movieismylife.ui.ReviewItem
 import com.example.movieismylife.viewmodel.MovieDetailViewModel
 import com.example.movieismylife.viewmodel.MovieListViewModel
 import com.example.movieismylife.viewmodel.MovieReviewViewModel
+import com.example.movieismylife.viewmodel.ReviewViewModel
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun MovieDetailPage(
     navController: NavController,
     movieDetailViewModel: MovieDetailViewModel,
-    movieReviewViewModel: MovieReviewViewModel
+    movieReviewViewModel: MovieReviewViewModel,
+    reviewViewModel: ReviewViewModel
 ) {
     // Sample data
     val movieDetail = movieDetailViewModel._movieDetail.value
@@ -221,7 +223,7 @@ fun MovieDetailPage(
                     }
                 }
                 if(isMovieDetail) MovieDetailInfo(movieDetail)
-                else Review(movieReviewViewModel)
+                else Review(movieReviewViewModel, reviewViewModel)
             }
         }
     }
@@ -338,10 +340,14 @@ fun MovieDetailInfo(movieDetail : MovieDetailResponse?) {
 }
 
 @Composable
-fun Review(movieReviewViewModel: MovieReviewViewModel) {
+fun Review(
+    movieReviewViewModel: MovieReviewViewModel,
+    reviewViewModel: ReviewViewModel
+    ) {
     val reviews by movieReviewViewModel.reviews.collectAsState()
 
     movieReviewViewModel.setSortOption(SortOption.LATEST)
+    reviewViewModel.onCreate("1", "1","Amazing Movie!")
     LazyColumn(
         modifier = Modifier.fillMaxSize(),
         verticalArrangement = Arrangement.spacedBy(4.dp)
