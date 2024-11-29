@@ -26,6 +26,7 @@ import com.example.movieismylife.viewmodel.MapViewModel
 import com.example.movieismylife.viewmodel.MovieDetailViewModel
 import com.example.movieismylife.viewmodel.MovieListViewModel
 import com.example.movieismylife.viewmodel.MovieReviewViewModel
+import com.example.movieismylife.viewmodel.ReviewViewModel
 import com.google.android.libraries.places.api.Places
 import com.google.android.libraries.places.api.net.PlacesClient
 
@@ -65,6 +66,7 @@ class MainActivity : ComponentActivity() {
                 val movieListViewModel = viewModel<MovieListViewModel>()
                 val movieDetailViewModel = viewModel<MovieDetailViewModel>()
                 val movieReviewViewModel = viewModel<MovieReviewViewModel>()
+                val reviewViewModel = viewModel<ReviewViewModel>()
 
                 val mapViewModel: MapViewModel = viewModel(
                     factory = viewModelFactory {
@@ -121,7 +123,8 @@ class MainActivity : ComponentActivity() {
                         MovieDetailPage(
                             navController=navController,
                             movieDetailViewModel=movieDetailViewModel,
-                            movieReviewViewModel=movieReviewViewModel
+                            movieReviewViewModel=movieReviewViewModel,
+                            reviewViewModel=reviewViewModel
                         )
                     }
                     composable(
