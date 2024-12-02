@@ -35,22 +35,22 @@ import androidx.navigation.compose.rememberNavController
 import com.example.movieismylife.ReplyPage
 import com.example.movieismylife.model.Comment
 import com.example.movieismylife.model.CommentView
+import com.example.movieismylife.model.ReplyView
 import com.example.movieismylife.viewmodel.MovieReviewViewModel
 import com.example.movieismylife.viewmodel.ReviewViewModel
 
 @Composable
-fun MovieDetailReviews(
-    review: CommentView,
-    navController: NavController,
-    reviewViewModel: ReviewViewModel
+fun MovieDetailReplies(
+    replyView: ReplyView
 ) {
     Column(
-        modifier = Modifier.fillMaxWidth()
+        modifier = Modifier
+            .fillMaxWidth()
+            .padding(top = 6.dp)
     ) {
         Card(
             modifier = Modifier
                 .fillMaxWidth()
-                .padding(bottom = 6.dp)
                 .height(200.dp),
             shape = RectangleShape,
             colors = CardDefaults.cardColors(
@@ -75,35 +75,23 @@ fun MovieDetailReviews(
                             modifier = Modifier
                                 .size(40.dp) // 크기 설정
                                 .clip(CircleShape) // 동그라미 모양
-                                .background(getColorFromString(review.profile)) // 배경색 설정
+                                .background(getColorFromString(replyView.profile)) // 배경색 설정
                         )
                         Spacer(
                             modifier = Modifier
                                 .width(10.dp)
                         )
                         Text(
-                            text = review.name,
+                            text = replyView.name,
                             color = Color.White
                         )
                         Spacer(
                             modifier = Modifier
                                 .width(260.dp)
                         )
-                        Icon(
-                            imageVector = Icons.Default.Favorite,
-                            contentDescription = null,
-                            tint = Color.White,
-                            modifier = Modifier
-                                .size(20.dp)
-                                .padding(top = 3.dp)
-                        )
-                        Text(
-                            text = review.score.toString(),
-                            color = Color.White
-                        )
                     }
                     Text(
-                        text = review.content,
+                        text = replyView.content,
                         color = Color.White
                     )
                 }
@@ -111,35 +99,7 @@ fun MovieDetailReviews(
                     modifier = Modifier
                         .height(8.dp)
                 )
-                Box(
-                    modifier = Modifier
-                        .fillMaxWidth()
-                        .padding(end = 12.dp),
-                    contentAlignment = Alignment.CenterEnd // 오른쪽 끝 정렬
-                ) {
-                    OutlinedButton(
-                        onClick = {
-                            navController.navigate("replyPage")
-                            reviewViewModel.updateData(review)
-                                  },
-                        colors = ButtonDefaults.buttonColors(containerColor = Color.Gray),
-                        modifier = Modifier.height(36.dp)
-                    ) {
-                        Text(text = "답글")
-                    }
-                }
             }
         }
-    }
-}
-
-fun getColorFromString(colorName: String): Color {
-    return when (colorName.uppercase()) { // 대소문자 구분 없이 처리
-        "WHITE" -> Color.White
-        "BLACK" -> Color.Black
-        "RED" -> Color.Red
-        "GREEN" -> Color.Green
-        "BLUE" -> Color.Blue
-        else -> Color.Transparent // 기본값
     }
 }

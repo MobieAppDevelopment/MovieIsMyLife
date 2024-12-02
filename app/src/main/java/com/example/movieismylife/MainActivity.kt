@@ -13,6 +13,7 @@ import androidx.activity.result.contract.ActivityResultContracts
 import androidx.compose.animation.slideInHorizontally
 import androidx.compose.animation.slideOutHorizontally
 import androidx.compose.runtime.LaunchedEffect
+import androidx.compose.runtime.collectAsState
 import androidx.core.content.ContextCompat
 import androidx.lifecycle.viewmodel.compose.viewModel
 import androidx.lifecycle.viewmodel.initializer
@@ -148,7 +149,10 @@ class MainActivity : ComponentActivity() {
                             onRequestLocationPermission = { requestLocationPermission() }
                         )
                     }
-                    composable("replyPage") { ReplyPage(navController) }
+                    composable("replyPage") { ReplyPage(
+                        navController,
+                        reviewViewModel
+                        ) }
                 }
             }
         }

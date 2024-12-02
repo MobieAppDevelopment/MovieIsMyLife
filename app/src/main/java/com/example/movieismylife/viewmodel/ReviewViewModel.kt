@@ -11,6 +11,7 @@ import com.google.firebase.firestore.FirebaseFirestore
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.flow.MutableStateFlow
+import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.tasks.await
@@ -21,8 +22,17 @@ class ReviewViewModel : ViewModel() {
 //    private val _comments = MutableLiveData<List<Comment>>()
 //    val comments: LiveData<List<Comment>> get() = _comments
 
+    // 상태 관리
+    private val _sharedData = MutableStateFlow<CommentView?>(null)
+    val sharedData: StateFlow<CommentView?> get() = _sharedData
+
     private val _comments = MutableStateFlow<List<CommentView>>(emptyList())
     val comments = _comments.asStateFlow()
+
+    // 상태 업데이트
+    fun updateData(commentData: CommentView) {
+        _sharedData.value = commentData
+    }
 
     fun createReview(userId:String, movieId:String, content:String, score:Float) {
         // Firestore 인스턴스 가져오기
@@ -70,6 +80,7 @@ class ReviewViewModel : ViewModel() {
                 val commentList = mutableListOf<CommentView>()
 
                 for (document in querySnapshot) {
+                    val documentId = document.id
                     val comment = document.toObject(Comment::class.java)
 
                     // Firestore에서 사용자 정보 가져오기
@@ -83,7 +94,9 @@ class ReviewViewModel : ViewModel() {
                         profile = profile ?: "",
                         title = "",
                         posterImage = "",
-                        createdAt = comment.createdAt
+                        createdAt = comment.createdAt,
+                        commentId = documentId,
+                        movieId = movieId
                     )
                     commentList.add(commentView)
                 }

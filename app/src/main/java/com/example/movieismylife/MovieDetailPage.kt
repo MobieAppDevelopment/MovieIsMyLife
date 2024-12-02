@@ -362,7 +362,7 @@ fun Review(
         verticalArrangement = Arrangement.spacedBy(4.dp)
     ) {
         items(comments) { comment ->
-            MovieDetailReviews(comment, navController)
+            MovieDetailReviews(comment, navController, reviewViewModel)
         }
     }
 }
