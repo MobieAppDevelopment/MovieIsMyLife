@@ -1,7 +1,5 @@
 package com.example.movieismylife
 
-import LoginPage
-import SignUpPage
 import android.content.pm.PackageManager
 import android.os.Build
 import android.os.Bundle
@@ -27,6 +25,7 @@ import com.example.movieismylife.viewmodel.MovieDetailViewModel
 import com.example.movieismylife.viewmodel.MovieListViewModel
 import com.example.movieismylife.viewmodel.MovieReviewViewModel
 import com.example.movieismylife.viewmodel.ReviewViewModel
+import com.example.movieismylife.viewmodel.SignInViewModel
 import com.example.movieismylife.viewmodel.SignUpViewModel
 import com.google.android.libraries.places.api.Places
 import com.google.android.libraries.places.api.net.PlacesClient
@@ -70,6 +69,7 @@ class MainActivity : ComponentActivity() {
                 val movieReviewViewModel = viewModel<MovieReviewViewModel>()
                 val reviewViewModel = viewModel<ReviewViewModel>()
                 val signUpViewModel = viewModel<SignUpViewModel>()
+                val signInViewModel = viewModel<SignInViewModel>()
 
                 val mapViewModel: MapViewModel = viewModel(
                     factory = viewModelFactory {
@@ -102,7 +102,10 @@ class MainActivity : ComponentActivity() {
                     startDestination = "login",
                 ){
                     composable(route = "login"){
-                        LoginPage(navController=navController)
+                        SignInPage(
+                            navController=navController,
+                            signInViewModel=signInViewModel
+                        )
                     }
                     composable(route = "signup"){
                         SignUpPage(

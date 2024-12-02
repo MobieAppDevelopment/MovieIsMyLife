@@ -1,3 +1,5 @@
+package com.example.movieismylife
+
 import android.widget.Toast
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.*
@@ -42,7 +44,7 @@ fun SignUpPage(
                 navController.popBackStack()
             }
             is SignUpState.Error -> {
-                Toast.makeText(context, "Sign In Failed", Toast.LENGTH_SHORT).show()
+                Toast.makeText(context, "Sign Up Failed", Toast.LENGTH_SHORT).show()
             }
             else -> {}
         }
