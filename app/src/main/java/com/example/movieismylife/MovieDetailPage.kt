@@ -62,6 +62,7 @@ import androidx.navigation.NavController
 import coil.compose.rememberAsyncImagePainter
 import com.example.movieismylife.enum.SortOption
 import com.example.movieismylife.response.MovieDetailResponse
+import com.example.movieismylife.ui.MovieDetailReviews
 import com.example.movieismylife.ui.ReviewItem
 import com.example.movieismylife.viewmodel.MovieDetailViewModel
 import com.example.movieismylife.viewmodel.MovieListViewModel
@@ -223,7 +224,12 @@ fun MovieDetailPage(
                     }
                 }
                 if(isMovieDetail) MovieDetailInfo(movieDetail)
-                else Review(movieReviewViewModel, reviewViewModel)
+                else Review(
+                    navController,
+                    movieReviewViewModel,
+                    reviewViewModel,
+                    movieDetail?.id.toString()
+                )
             }
         }
     }
@@ -341,19 +347,22 @@ fun MovieDetailInfo(movieDetail : MovieDetailResponse?) {
 
 @Composable
 fun Review(
+    navController: NavController,
     movieReviewViewModel: MovieReviewViewModel,
-    reviewViewModel: ReviewViewModel
+    reviewViewModel: ReviewViewModel,
+    movieId: String
     ) {
-    val reviews by movieReviewViewModel.reviews.collectAsState()
+    val comments by reviewViewModel.comments.collectAsState()
 
     movieReviewViewModel.setSortOption(SortOption.LATEST)
-    reviewViewModel.onCreate("1", "1","Amazing Movie!")
+//    reviewViewModel.createReview("1", movieId,"Amazing Movie!", 5f)
+    reviewViewModel.loadComments(movieId)
     LazyColumn(
         modifier = Modifier.fillMaxSize(),
         verticalArrangement = Arrangement.spacedBy(4.dp)
     ) {
-        items(reviews) { review ->
-            ReviewItem(review = review)
+        items(comments) { comment ->
+            MovieDetailReviews(comment, navController)
         }
     }
 }

@@ -148,6 +148,7 @@ class MainActivity : ComponentActivity() {
                             onRequestLocationPermission = { requestLocationPermission() }
                         )
                     }
+                    composable("replyPage") { ReplyPage(navController) }
                 }
             }
         }

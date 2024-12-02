@@ -1,12 +1,9 @@
 package com.example.movieismylife.viewmodel
 
 import android.util.Log
-import androidx.lifecycle.LiveData
-import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.ViewModel
 import com.example.movieismylife.model.Comment
 import com.example.movieismylife.model.CommentView
-import com.example.movieismylife.model.MovieReview
 import com.google.firebase.firestore.FirebaseFirestore
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
@@ -16,7 +13,7 @@ import kotlinx.coroutines.launch
 import kotlinx.coroutines.tasks.await
 import kotlinx.coroutines.withContext
 
-class ReviewViewModel : ViewModel() {
+class ReplyViewModel : ViewModel() {
     // 댓글을 저장할 MutableLiveData
 //    private val _comments = MutableLiveData<List<Comment>>()
 //    val comments: LiveData<List<Comment>> get() = _comments
@@ -24,7 +21,8 @@ class ReviewViewModel : ViewModel() {
     private val _comments = MutableStateFlow<List<CommentView>>(emptyList())
     val comments = _comments.asStateFlow()
 
-    fun createReview(userId:String, movieId:String, content:String, score:Float) {
+    fun createReview(userId: String, movieId: String, content: String, score: Float) {
+        Log.d("Firestore", "!!!!!!!")
         // Firestore 인스턴스 가져오기
         val db = FirebaseFirestore.getInstance()
 
