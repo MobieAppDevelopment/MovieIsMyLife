@@ -5,5 +5,5 @@ data class User(
     val name: String = "",
     val userName: String = "",
     val password: String = "",
-    val profile: String = "",
+    val profile: String = "WHITE",
 )

@@ -27,8 +27,10 @@ import com.example.movieismylife.viewmodel.MovieDetailViewModel
 import com.example.movieismylife.viewmodel.MovieListViewModel
 import com.example.movieismylife.viewmodel.MovieReviewViewModel
 import com.example.movieismylife.viewmodel.ReviewViewModel
+import com.example.movieismylife.viewmodel.SignUpViewModel
 import com.google.android.libraries.places.api.Places
 import com.google.android.libraries.places.api.net.PlacesClient
+import kotlin.math.sign
 
 
 class MainActivity : ComponentActivity() {
@@ -67,6 +69,7 @@ class MainActivity : ComponentActivity() {
                 val movieDetailViewModel = viewModel<MovieDetailViewModel>()
                 val movieReviewViewModel = viewModel<MovieReviewViewModel>()
                 val reviewViewModel = viewModel<ReviewViewModel>()
+                val signUpViewModel = viewModel<SignUpViewModel>()
 
                 val mapViewModel: MapViewModel = viewModel(
                     factory = viewModelFactory {
@@ -103,9 +106,8 @@ class MainActivity : ComponentActivity() {
                     }
                     composable(route = "signup"){
                         SignUpPage(
-                            backToLoginPage = {
-                                navController.navigateUp()
-                            }
+                            navController = navController,
+                            signUpViewModel = signUpViewModel,
                         )
                     }
                     composable(
@@ -147,6 +149,24 @@ class MainActivity : ComponentActivity() {
                             mapViewModel = mapViewModel,
                             onRequestLocationPermission = { requestLocationPermission() }
                         )
+                    }
+                    composable(route = "my",
+                        enterTransition = { slideInHorizontally() },
+                        exitTransition = { slideOutHorizontally() }
+                    ) {
+                        MyPage(navController = navController)
+                    }
+                    composable(route = "my",
+                        enterTransition = { slideInHorizontally() },
+                        exitTransition = { slideOutHorizontally() }
+                    ) {
+                        MyPage(navController = navController)
+                    }
+                    composable(route = "my",
+                        enterTransition = { slideInHorizontally() },
+                        exitTransition = { slideOutHorizontally() }
+                    ) {
+                        MyPage(navController = navController)
                     }
                 }
             }

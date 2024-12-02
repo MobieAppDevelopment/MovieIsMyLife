@@ -1,3 +1,4 @@
+import android.widget.Toast
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.text.KeyboardOptions
@@ -11,19 +12,41 @@ import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.text.input.KeyboardType
 import androidx.compose.ui.text.input.PasswordVisualTransformation
 import androidx.compose.ui.text.input.VisualTransformation
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+import androidx.navigation.NavController
+import com.example.movieismylife.viewmodel.SignUpState
+import com.example.movieismylife.viewmodel.SignUpViewModel
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
-fun SignUpPage(backToLoginPage : () -> Unit){//onNavigateToLogin: () -> Unit, onSignUp: (String, String, String) -> Unit) {
+fun SignUpPage(
+    navController: NavController,
+    signUpViewModel: SignUpViewModel
+){
+    val uiState = signUpViewModel.state.collectAsState()
+
     var name by remember { mutableStateOf("") }
-    var email by remember { mutableStateOf("") }
+    var userName by remember { mutableStateOf("") }
     var password by remember { mutableStateOf("") }
     var passwordVisible by remember { mutableStateOf(false) }
+
+    val context = LocalContext.current
+    LaunchedEffect(key1 = uiState.value) {
+        when(uiState.value) {
+            is SignUpState.Success -> {
+                navController.popBackStack()
+            }
+            is SignUpState.Error -> {
+                Toast.makeText(context, "Sign In Failed", Toast.LENGTH_SHORT).show()
+            }
+            else -> {}
+        }
+    }
 
     Surface(
         modifier = Modifier.fillMaxSize(),
@@ -61,9 +84,9 @@ fun SignUpPage(backToLoginPage : () -> Unit){//onNavigateToLogin: () -> Unit, on
             )
 
             OutlinedTextField(
-                value = email,
-                onValueChange = { email = it },
-                label = { Text("Email", color = Color.White) },
+                value = userName,
+                onValueChange = { userName = it },
+                label = { Text("userName", color = Color.White) },
                 singleLine = true,
                 modifier = Modifier
                     .fillMaxWidth()
@@ -104,24 +127,34 @@ fun SignUpPage(backToLoginPage : () -> Unit){//onNavigateToLogin: () -> Unit, on
                     unfocusedBorderColor = Color.Gray
                 )
             )
-
-            Button(
-                onClick = {  },//onSignUp(name, email, password) },
-                modifier = Modifier
-                    .fillMaxWidth()
-                    .height(50.dp),
-                colors = ButtonDefaults.buttonColors(containerColor = Color.Red)
-            ) {
-                Text("Sign Up", color = Color.White)
+            if(uiState.value == SignUpState.Loading) {
+                CircularProgressIndicator()
             }
+            else {
+                Button(
+                    onClick = {
+                        signUpViewModel.signUp(
+                            name = name, userName = userName, password = password, profile = "WHITE"
+                        )
+                    },
+                    modifier = Modifier
+                        .fillMaxWidth()
+                        .height(50.dp),
+                    colors = ButtonDefaults.buttonColors(containerColor = Color.Red)
+                ) {
+                    Text("Sign Up", color = Color.White)
+                }
 
-            Spacer(modifier = Modifier.height(16.dp))
+                Spacer(modifier = Modifier.height(16.dp))
 
-            Text(
-                "Already have an account? Login",
-                color = Color.White,
-                modifier = Modifier.clickable(onClick = {backToLoginPage()})//onNavigateToLogin)
-            )
+                Text(
+                    "Already have an account? Login",
+                    color = Color.White,
+                    modifier = Modifier.clickable(
+                        onClick = { navController.popBackStack() }
+                    )//onNavigateToLogin)
+                )
+            }
         }
     }
 }
