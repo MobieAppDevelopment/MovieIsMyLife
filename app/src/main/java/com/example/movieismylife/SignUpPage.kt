@@ -150,11 +150,11 @@ fun SignUpPage(
                 Spacer(modifier = Modifier.height(16.dp))
 
                 Text(
-                    "Already have an account? Login",
+                    "Already have an account? Sign In",
                     color = Color.White,
                     modifier = Modifier.clickable(
                         onClick = { navController.popBackStack() }
-                    )//onNavigateToLogin)
+                    )
                 )
             }
         }

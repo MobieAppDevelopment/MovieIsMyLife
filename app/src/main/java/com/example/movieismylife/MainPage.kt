@@ -320,7 +320,12 @@ fun MovieBottomBar(navController: NavController) {
             horizontalAlignment = Alignment.CenterHorizontally
         ) {
             IconButton(onClick = {
-                navController.navigate("main")
+                navController.navigate("main") {
+                    popUpTo("main") { inclusive = true }
+                    popUpTo("search") { inclusive = true }
+                    popUpTo("map") { inclusive = true }
+                    popUpTo("my") { inclusive = true }
+                }
             }) {
                 Icon(
                     imageVector = Icons.Filled.Home,
@@ -334,7 +339,12 @@ fun MovieBottomBar(navController: NavController) {
             horizontalAlignment = Alignment.CenterHorizontally
         ) {
             IconButton(onClick = {
-                navController.navigate("search")
+                navController.navigate("search") {
+                    popUpTo("main") { inclusive = true }
+                    popUpTo("search") { inclusive = true }
+                    popUpTo("map") { inclusive = true }
+                    popUpTo("my") { inclusive = true }
+                }
             }) {
                 Icon(
                     imageVector = Icons.Filled.Search,
@@ -348,7 +358,12 @@ fun MovieBottomBar(navController: NavController) {
             horizontalAlignment = Alignment.CenterHorizontally
         ) {
             IconButton(onClick = {
-                navController.navigate("map")
+                navController.navigate("map") {
+                    popUpTo("main") { inclusive = true }
+                    popUpTo("search") { inclusive = true }
+                    popUpTo("map") { inclusive = true }
+                    popUpTo("my") { inclusive = true }
+                }
             }) {
                 Icon(
                     imageVector = Icons.Filled.LocationOn,
@@ -362,7 +377,12 @@ fun MovieBottomBar(navController: NavController) {
             horizontalAlignment = Alignment.CenterHorizontally
         ) {
             IconButton(onClick = {
-                navController.navigate("mypage")
+                navController.navigate("my") {
+                    popUpTo("main") { inclusive = true }
+                    popUpTo("search") { inclusive = true }
+                    popUpTo("map") { inclusive = true }
+                    popUpTo("my") { inclusive = true }
+                }
             }) {
                 Icon(
                     imageVector = Icons.Filled.Person,

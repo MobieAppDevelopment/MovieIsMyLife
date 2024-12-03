@@ -24,6 +24,7 @@ import com.example.movieismylife.viewmodel.MapViewModel
 import com.example.movieismylife.viewmodel.MovieDetailViewModel
 import com.example.movieismylife.viewmodel.MovieListViewModel
 import com.example.movieismylife.viewmodel.MovieReviewViewModel
+import com.example.movieismylife.viewmodel.MyPageViewModel
 import com.example.movieismylife.viewmodel.ReviewViewModel
 import com.example.movieismylife.viewmodel.SignInViewModel
 import com.example.movieismylife.viewmodel.SignUpViewModel
@@ -99,9 +100,9 @@ class MainActivity : ComponentActivity() {
 
                 NavHost(
                     navController = navController,
-                    startDestination = "login",
+                    startDestination = "signin",
                 ){
-                    composable(route = "login"){
+                    composable(route = "signin"){
                         SignInPage(
                             navController=navController,
                             signInViewModel=signInViewModel
@@ -157,20 +158,24 @@ class MainActivity : ComponentActivity() {
                         enterTransition = { slideInHorizontally() },
                         exitTransition = { slideOutHorizontally() }
                     ) {
-                        MyPage(navController = navController)
+                        MyPage(
+                            navController = navController,
+                            myPageViewModel = MyPageViewModel(),
+                            signInViewModel = SignInViewModel()
+                        )
                     }
-                    composable(route = "my",
-                        enterTransition = { slideInHorizontally() },
-                        exitTransition = { slideOutHorizontally() }
-                    ) {
-                        MyPage(navController = navController)
-                    }
-                    composable(route = "my",
-                        enterTransition = { slideInHorizontally() },
-                        exitTransition = { slideOutHorizontally() }
-                    ) {
-                        MyPage(navController = navController)
-                    }
+//                    composable(route = "my",
+//                        enterTransition = { slideInHorizontally() },
+//                        exitTransition = { slideOutHorizontally() }
+//                    ) {
+//                        MyPage(navController = navController)
+//                    }
+//                    composable(route = "my",
+//                        enterTransition = { slideInHorizontally() },
+//                        exitTransition = { slideOutHorizontally() }
+//                    ) {
+//                        MyPage(navController = navController)
+//                    }
                 }
             }
         }

@@ -39,7 +39,9 @@ fun SignInPage(
     LaunchedEffect(key1 = uiState.value) {
         when(uiState.value) {
             is SignInState.Success -> {
-                navController.navigate("main")
+                navController.navigate("main") {
+                    popUpTo("signin") { inclusive = true }
+                }
             }
             is SignInState.Error -> {
                 Toast.makeText(context, "Sign In Failed", Toast.LENGTH_SHORT).show()
