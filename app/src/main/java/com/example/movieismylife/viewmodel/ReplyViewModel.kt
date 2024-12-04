@@ -56,13 +56,15 @@ class ReplyViewModel : ViewModel() {
     }
 
     // 댓글을 비동기적으로 불러오는 함수
-    fun loadReplies(commentId: String) {
+    fun loadReplies(movieId: String, commentId: String) {
         CoroutineScope(Dispatchers.IO).launch {
             val db = FirebaseFirestore.getInstance()
 
             try {
                 // Firestore에서 댓글 가져오기
-                val querySnapshot = db.collection("comments")
+                val querySnapshot = db.collection("movies")
+                    .document(movieId)
+                    .collection("comments")
                     .document(commentId)
                     .collection("replies")
                     .get()

@@ -67,6 +67,7 @@ import com.example.movieismylife.ui.ReviewItem
 import com.example.movieismylife.viewmodel.MovieDetailViewModel
 import com.example.movieismylife.viewmodel.MovieListViewModel
 import com.example.movieismylife.viewmodel.MovieReviewViewModel
+import com.example.movieismylife.viewmodel.ReplyViewModel
 import com.example.movieismylife.viewmodel.ReviewViewModel
 
 @OptIn(ExperimentalMaterial3Api::class)
@@ -75,7 +76,8 @@ fun MovieDetailPage(
     navController: NavController,
     movieDetailViewModel: MovieDetailViewModel,
     movieReviewViewModel: MovieReviewViewModel,
-    reviewViewModel: ReviewViewModel
+    reviewViewModel: ReviewViewModel,
+    replyViewModel: ReplyViewModel
 ) {
     // Sample data
     val movieDetail = movieDetailViewModel._movieDetail.value
@@ -211,7 +213,7 @@ fun MovieDetailPage(
                     }
                     Spacer(
                         modifier = Modifier
-                            .width(120.dp)
+                            .width(80.dp)
                     )
                     Box(
                         modifier = Modifier.clickable(onClick = { if(isMovieDetail) isMovieDetail = !isMovieDetail })
@@ -222,13 +224,27 @@ fun MovieDetailPage(
                             fontSize = 18.sp // Set the text size
                         )
                     }
+                    Spacer(
+                        modifier = Modifier
+                            .width(80.dp)
+                    )
+                    Box(
+                        modifier = Modifier.clickable(onClick = { navController.navigate("theaterPage") })
+                    ) {
+                        Text(
+                            text = "상영정보",
+                            color = Color.White, // Set the text color
+                            fontSize = 18.sp // Set the text size
+                        )
+                    }
                 }
                 if(isMovieDetail) MovieDetailInfo(movieDetail)
                 else Review(
                     navController,
                     movieReviewViewModel,
                     reviewViewModel,
-                    movieDetail?.id.toString()
+                    movieDetail?.id.toString(),
+                    replyViewModel
                 )
             }
         }
@@ -350,7 +366,8 @@ fun Review(
     navController: NavController,
     movieReviewViewModel: MovieReviewViewModel,
     reviewViewModel: ReviewViewModel,
-    movieId: String
+    movieId: String,
+    replyViewModel: ReplyViewModel
     ) {
     val comments by reviewViewModel.comments.collectAsState()
 
@@ -362,7 +379,7 @@ fun Review(
         verticalArrangement = Arrangement.spacedBy(4.dp)
     ) {
         items(comments) { comment ->
-            MovieDetailReviews(comment, navController, reviewViewModel)
+            MovieDetailReviews(comment, navController, reviewViewModel, replyViewModel)
         }
     }
 }

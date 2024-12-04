@@ -1,5 +1,6 @@
 package com.example.movieismylife.ui
 
+import android.util.Log
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
@@ -28,6 +29,7 @@ import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.RectangleShape
 import androidx.compose.ui.unit.dp
+import androidx.lifecycle.viewmodel.compose.viewModel
 import androidx.navigation.NavController
 import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
@@ -36,13 +38,15 @@ import com.example.movieismylife.ReplyPage
 import com.example.movieismylife.model.Comment
 import com.example.movieismylife.model.CommentView
 import com.example.movieismylife.viewmodel.MovieReviewViewModel
+import com.example.movieismylife.viewmodel.ReplyViewModel
 import com.example.movieismylife.viewmodel.ReviewViewModel
 
 @Composable
 fun MovieDetailReviews(
     review: CommentView,
     navController: NavController,
-    reviewViewModel: ReviewViewModel
+    reviewViewModel: ReviewViewModel,
+    replyViewModel: ReplyViewModel
 ) {
     Column(
         modifier = Modifier.fillMaxWidth()
@@ -119,8 +123,10 @@ fun MovieDetailReviews(
                 ) {
                     OutlinedButton(
                         onClick = {
-                            navController.navigate("replyPage")
-                            reviewViewModel.updateData(review)
+                            navController.navigate("replyPage/${review.movieId}&${review.commentId}") // reply create할 때 ReplyPage에서 사용
+                            replyViewModel.loadReplies(movieId = review.movieId, commentId = review.commentId)
+                            Log.w("MovieListViewModel", "영화 리스트가 비어있습니다.")
+//                            reviewViewModel.updateData(review)
                                   },
                         colors = ButtonDefaults.buttonColors(containerColor = Color.Gray),
                         modifier = Modifier.height(36.dp)
