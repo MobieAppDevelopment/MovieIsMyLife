@@ -25,14 +25,17 @@ import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.foundation.verticalScroll
 import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.automirrored.filled.ArrowBack
 import androidx.compose.material.icons.filled.Favorite
 import androidx.compose.material.icons.filled.Menu
 import androidx.compose.material.icons.filled.Search
+import androidx.compose.material.icons.filled.Star
 import androidx.compose.material3.Button
 import androidx.compose.material3.Card
 import androidx.compose.material3.CardColors
 import androidx.compose.material3.CardDefaults
 import androidx.compose.material3.CenterAlignedTopAppBar
+import androidx.compose.material3.CircularProgressIndicator
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
@@ -43,6 +46,7 @@ import androidx.compose.material3.Text
 import androidx.compose.material3.TopAppBar
 import androidx.compose.material3.TopAppBarDefaults
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
@@ -62,11 +66,14 @@ import androidx.navigation.NavController
 import coil.compose.rememberAsyncImagePainter
 import com.example.movieismylife.enum.SortOption
 import com.example.movieismylife.response.MovieDetailResponse
+import com.example.movieismylife.ui.MovieDetailReviews
 import com.example.movieismylife.ui.ReviewItem
 import com.example.movieismylife.viewmodel.MovieDetailViewModel
 import com.example.movieismylife.viewmodel.MovieListViewModel
 import com.example.movieismylife.viewmodel.MovieReviewViewModel
+import com.example.movieismylife.viewmodel.ReplyViewModel
 import com.example.movieismylife.viewmodel.ReviewViewModel
+import kotlinx.coroutines.delay
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
@@ -74,7 +81,9 @@ fun MovieDetailPage(
     navController: NavController,
     movieDetailViewModel: MovieDetailViewModel,
     movieReviewViewModel: MovieReviewViewModel,
-    reviewViewModel: ReviewViewModel
+    reviewViewModel: ReviewViewModel,
+    replyViewModel: ReplyViewModel,
+    onClickBackArrow: () -> Unit,
 ) {
     // Sample data
     val movieDetail = movieDetailViewModel._movieDetail.value
@@ -126,6 +135,15 @@ fun MovieDetailPage(
                                     )
                                 )
                         )
+                        Box(){
+                            IconButton(onClick = onClickBackArrow) {
+                                Icon(
+                                    imageVector = Icons.AutoMirrored.Filled.ArrowBack,
+                                    contentDescription = null,
+                                    tint = Color.White
+                                )
+                            }
+                        }
                         Row(
                             modifier = Modifier
                                 .fillMaxHeight()
@@ -170,7 +188,7 @@ fun MovieDetailPage(
                                 )
                                 Row {
                                     Icon(
-                                        imageVector = Icons.Default.Favorite,
+                                        imageVector = Icons.Default.Star,
                                         contentDescription = null,
                                         tint = Color.White,
                                         modifier = Modifier
@@ -210,10 +228,15 @@ fun MovieDetailPage(
                     }
                     Spacer(
                         modifier = Modifier
-                            .width(120.dp)
+                            .width(80.dp)
                     )
                     Box(
-                        modifier = Modifier.clickable(onClick = { if(isMovieDetail) isMovieDetail = !isMovieDetail })
+                        modifier = Modifier.clickable(onClick =
+                            {
+                                if(isMovieDetail) isMovieDetail = !isMovieDetail
+                                reviewViewModel.loadComments(movieDetail?.id.toString(), userId = "2") // user: 로그인돼있는 유저
+                            }
+                        )
                     ) {
                         Text(
                             text = "리뷰",
@@ -221,9 +244,28 @@ fun MovieDetailPage(
                             fontSize = 18.sp // Set the text size
                         )
                     }
+                    Spacer(
+                        modifier = Modifier
+                            .width(80.dp)
+                    )
+                    Box(
+                        modifier = Modifier.clickable(onClick = { navController.navigate("theaterPage") })
+                    ) {
+                        Text(
+                            text = "상영정보",
+                            color = Color.White, // Set the text color
+                            fontSize = 18.sp // Set the text size
+                        )
+                    }
                 }
                 if(isMovieDetail) MovieDetailInfo(movieDetail)
-                else Review(movieReviewViewModel, reviewViewModel)
+                else Review(
+                    navController,
+                    movieReviewViewModel,
+                    reviewViewModel,
+                    movieDetailViewModel,
+                    replyViewModel
+                )
             }
         }
     }
@@ -341,19 +383,40 @@ fun MovieDetailInfo(movieDetail : MovieDetailResponse?) {
 
 @Composable
 fun Review(
+    navController: NavController,
     movieReviewViewModel: MovieReviewViewModel,
-    reviewViewModel: ReviewViewModel
+    reviewViewModel: ReviewViewModel,
+    movieDetailViewModel: MovieDetailViewModel,
+    replyViewModel: ReplyViewModel
     ) {
-    val reviews by movieReviewViewModel.reviews.collectAsState()
+    val comments by reviewViewModel.comments.collectAsState(initial = emptyList())
+    val isLoading by reviewViewModel.isLoading.collectAsState()
 
-    movieReviewViewModel.setSortOption(SortOption.LATEST)
-    reviewViewModel.onCreate("1", "1","Amazing Movie!")
-    LazyColumn(
-        modifier = Modifier.fillMaxSize(),
-        verticalArrangement = Arrangement.spacedBy(4.dp)
-    ) {
-        items(reviews) { review ->
-            ReviewItem(review = review)
+//    val isLoading = remember { mutableStateOf(true) }
+//
+//    LaunchedEffect(key1 = Unit) {
+//        reviewViewModel.comments.collect {
+//            isLoading.value = it.isEmpty()
+//        }
+//    }
+
+    if (isLoading) {
+        // 데이터가 로드되는 동안 CircularProgressIndicator 표시
+        CircularProgressIndicator()
+    } else {
+        // 데이터가 로드된 후 Comment 리스트를 표시
+        movieReviewViewModel.setSortOption(SortOption.LATEST)
+//    reviewViewModel.createReview("1", movieId,"Amazing Movie!", 5f)
+//    reviewViewModel.loadComments(movieId)
+        LazyColumn(
+            modifier = Modifier
+                .fillMaxSize()
+                .padding(bottom = 4.dp),
+            verticalArrangement = Arrangement.spacedBy(4.dp)
+        ) {
+            items(comments) { comment ->
+                MovieDetailReviews(comment, navController, reviewViewModel, replyViewModel, movieDetailViewModel)
+            }
         }
     }
 }
