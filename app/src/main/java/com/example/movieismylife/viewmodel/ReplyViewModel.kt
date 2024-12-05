@@ -24,7 +24,7 @@ class ReplyViewModel : ViewModel() {
     private val _replies = MutableStateFlow<List<ReplyView>>(emptyList())
     val replies = _replies.asStateFlow()
 
-    fun createReply(userId: String, movieId: String, commentId: String?, content: String) {
+    fun createReply(userId: String, commentId: String?, content: String) {
         // Firestore 인스턴스 가져오기
         val db = FirebaseFirestore.getInstance()
 
@@ -40,9 +40,7 @@ class ReplyViewModel : ViewModel() {
 //        val movieId = movieId  // 특정 영화의 ID (예: Inception, Titanic 등)
 
         // movies 컬렉션에서 해당 movieId 문서의 comments 서브컬렉션 안의 commentId 문서의 replies 서브컬렉션에 추가
-        db.collection("movies")
-            .document(movieId)  // 특정 영화 ID
-            .collection("comments")
+        db.collection("comments")
             .document(commentId ?: "")  // 특정 commentId
             .collection("replies")
             .add(reply)

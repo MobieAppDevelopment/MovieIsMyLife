@@ -175,7 +175,8 @@ class MainActivity : ComponentActivity() {
                             onClickBackArrow = {
                                 navController.popBackStack()
                                 reviewViewModel.loadComments(movieId = movieId, userId = "2")
-                            }
+                            },
+                            commentId = commentId
                         ) }
                     composable("theaterPage") { TheaterPage(
                         navController,

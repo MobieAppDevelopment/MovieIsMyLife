@@ -16,6 +16,8 @@ import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
 import androidx.compose.foundation.shape.CircleShape
+import androidx.compose.foundation.text.KeyboardActions
+import androidx.compose.foundation.text.KeyboardOptions
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.automirrored.filled.ArrowBack
 import androidx.compose.material.icons.filled.Favorite
@@ -41,7 +43,9 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.RectangleShape
+import androidx.compose.ui.platform.LocalSoftwareKeyboardController
 import androidx.compose.ui.text.TextStyle
+import androidx.compose.ui.text.input.ImeAction
 import androidx.compose.ui.unit.dp
 import androidx.lifecycle.viewmodel.compose.viewModel
 import androidx.navigation.NavController
@@ -62,6 +66,7 @@ fun ReplyPage(
     replyViewModel: ReplyViewModel,
     movieDetailViewModel: MovieDetailViewModel,
     onClickBackArrow: () -> Unit,
+    commentId: String
     ) {
 //    val replyViewModel = viewModel<ReplyViewModel>()
     val replies by replyViewModel.replies.collectAsState()
@@ -69,6 +74,7 @@ fun ReplyPage(
     var content by remember {
         mutableStateOf("")
     }
+    val keyboardController = LocalSoftwareKeyboardController.current // 키보드 컨트롤러
 
 //    replyViewModel.createReply("1", comment?.movieId ?: "", comment?.commentId ?: "", "I think so too")
     // 데이터 로딩 함수 호출을 제어
@@ -114,6 +120,18 @@ fun ReplyPage(
                             .padding(8.dp),
                         label = { Text(text = "답글 추가") },
                         textStyle = TextStyle(color = Color.White),
+                        keyboardOptions = KeyboardOptions.Default.copy(
+                            imeAction = ImeAction.Done // 엔터 버튼을 "Done"으로 설정
+                        ),
+                        keyboardActions = KeyboardActions(
+                            onDone = {
+                                // 엔터 키 동작 정의
+                                replyViewModel.createReply(userId = "2", commentId = commentId, content = content) // 콜백 호출
+                                replyViewModel.loadReplies(commentId = commentId)
+                                content = ""
+                                keyboardController?.hide() // 키보드 숨기기
+                            }
+                        )
                     )
                 }
                 LazyColumn(
