@@ -9,5 +9,7 @@ data class CommentView (
     val posterImage: String = "",
     val createdAt: Long = 0,
     val commentId: String = "",
-    val movieId: String = ""
+    val movieId: String = "",
+    val userLike: Boolean = false,
+    val likeCount: Int = 0
 )

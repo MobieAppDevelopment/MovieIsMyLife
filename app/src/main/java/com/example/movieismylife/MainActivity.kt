@@ -154,21 +154,17 @@ class MainActivity : ComponentActivity() {
                             onRequestLocationPermission = { requestLocationPermission() }
                         )
                     }
-                    composable("replyPage/{movieId}&{commentId}", arguments = listOf(
-                        navArgument("movieId") {
-                            type = NavType.StringType
-                        },
+                    composable("replyPage/{commentId}", arguments = listOf(
                         navArgument("commentId") {
                             type = NavType.StringType
                         }
                     )) {
-                        val movieId = it.arguments?.getString("movieId") ?: ""
                         val commentId = it.arguments?.getString("commentId") ?: ""
                         ReplyPage(
                             navController = navController,
                             reviewViewModel = reviewViewModel,
                             replyViewModel = replyViewModel,
-                            movieId = movieId,
+                            movieDetailViewModel = movieDetailViewModel,
                             commentId = commentId
                         ) }
                     composable("theaterPage") { TheaterPage(

@@ -20,6 +20,7 @@ import androidx.navigation.NavController
 import com.example.movieismylife.model.CommentView
 import com.example.movieismylife.ui.MovieDetailReplies
 import com.example.movieismylife.ui.MovieDetailReviews
+import com.example.movieismylife.viewmodel.MovieDetailViewModel
 import com.example.movieismylife.viewmodel.ReplyViewModel
 import com.example.movieismylife.viewmodel.ReviewViewModel
 import kotlinx.coroutines.flow.StateFlow
@@ -30,7 +31,7 @@ fun ReplyPage(
     navController : NavController,
     reviewViewModel: ReviewViewModel,
     replyViewModel: ReplyViewModel,
-    movieId : String,
+    movieDetailViewModel: MovieDetailViewModel,
     commentId : String
 ) {
 //    val replyViewModel = viewModel<ReplyViewModel>()
