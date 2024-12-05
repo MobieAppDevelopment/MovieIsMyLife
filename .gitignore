@@ -18,6 +18,8 @@
 local.properties
 
 /src/main/res/values/apiKey.xml
+/google-services.json
+/app/google-services.json
 **/apiKey.xml
 /.idea/codeStyles/
 /.idea/

@@ -1,7 +1,5 @@
 package com.example.movieismylife
 
-import LoginPage
-import SignUpPage
 import android.content.pm.PackageManager
 import android.os.Build
 import android.os.Bundle
@@ -30,9 +28,13 @@ import com.example.movieismylife.viewmodel.MovieDetailViewModel
 import com.example.movieismylife.viewmodel.MovieListViewModel
 import com.example.movieismylife.viewmodel.MovieReviewViewModel
 import com.example.movieismylife.viewmodel.ReplyViewModel
+import com.example.movieismylife.viewmodel.MyPageViewModel
 import com.example.movieismylife.viewmodel.ReviewViewModel
+import com.example.movieismylife.viewmodel.SignInViewModel
+import com.example.movieismylife.viewmodel.SignUpViewModel
 import com.google.android.libraries.places.api.Places
 import com.google.android.libraries.places.api.net.PlacesClient
+import kotlin.math.sign
 
 
 class MainActivity : ComponentActivity() {
@@ -72,6 +74,8 @@ class MainActivity : ComponentActivity() {
                 val movieReviewViewModel = viewModel<MovieReviewViewModel>()
                 val reviewViewModel = viewModel<ReviewViewModel>()
                 val replyViewModel = viewModel<ReplyViewModel>()
+                val signUpViewModel = viewModel<SignUpViewModel>()
+                val signInViewModel = viewModel<SignInViewModel>()
 
                 val mapViewModel: MapViewModel = viewModel(
                     factory = viewModelFactory {
@@ -101,16 +105,18 @@ class MainActivity : ComponentActivity() {
 
                 NavHost(
                     navController = navController,
-                    startDestination = "login",
+                    startDestination = "signin",
                 ){
-                    composable(route = "login"){
-                        LoginPage(navController=navController)
+                    composable(route = "signin"){
+                        SignInPage(
+                            navController=navController,
+                            signInViewModel=signInViewModel
+                        )
                     }
                     composable(route = "signup"){
                         SignUpPage(
-                            backToLoginPage = {
-                                navController.navigateUp()
-                            }
+                            navController = navController,
+                            signUpViewModel = signUpViewModel,
                         )
                     }
                     composable(
@@ -182,6 +188,28 @@ class MainActivity : ComponentActivity() {
                         navController,
                         movieDetailViewModel
                     ) }
+                    composable(route = "my",
+                        enterTransition = { slideInHorizontally() },
+                        exitTransition = { slideOutHorizontally() }
+                    ) {
+                        MyPage(
+                            navController = navController,
+                            myPageViewModel = MyPageViewModel(),
+                            signInViewModel = SignInViewModel()
+                        )
+                    }
+//                    composable(route = "my",
+//                        enterTransition = { slideInHorizontally() },
+//                        exitTransition = { slideOutHorizontally() }
+//                    ) {
+//                        MyPage(navController = navController)
+//                    }
+//                    composable(route = "my",
+//                        enterTransition = { slideInHorizontally() },
+//                        exitTransition = { slideOutHorizontally() }
+//                    ) {
+//                        MyPage(navController = navController)
+//                    }
                 }
             }
         }
