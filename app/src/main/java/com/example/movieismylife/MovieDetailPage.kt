@@ -25,6 +25,7 @@ import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.foundation.verticalScroll
 import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.automirrored.filled.ArrowBack
 import androidx.compose.material.icons.filled.Favorite
 import androidx.compose.material.icons.filled.Menu
 import androidx.compose.material.icons.filled.Search
@@ -81,7 +82,8 @@ fun MovieDetailPage(
     movieDetailViewModel: MovieDetailViewModel,
     movieReviewViewModel: MovieReviewViewModel,
     reviewViewModel: ReviewViewModel,
-    replyViewModel: ReplyViewModel
+    replyViewModel: ReplyViewModel,
+    onClickBackArrow: () -> Unit,
 ) {
     // Sample data
     val movieDetail = movieDetailViewModel._movieDetail.value
@@ -133,6 +135,15 @@ fun MovieDetailPage(
                                     )
                                 )
                         )
+                        Box(){
+                            IconButton(onClick = onClickBackArrow) {
+                                Icon(
+                                    imageVector = Icons.AutoMirrored.Filled.ArrowBack,
+                                    contentDescription = null,
+                                    tint = Color.White
+                                )
+                            }
+                        }
                         Row(
                             modifier = Modifier
                                 .fillMaxHeight()
@@ -398,7 +409,9 @@ fun Review(
 //    reviewViewModel.createReview("1", movieId,"Amazing Movie!", 5f)
 //    reviewViewModel.loadComments(movieId)
         LazyColumn(
-            modifier = Modifier.fillMaxSize(),
+            modifier = Modifier
+                .fillMaxSize()
+                .padding(bottom = 4.dp),
             verticalArrangement = Arrangement.spacedBy(4.dp)
         ) {
             items(comments) { comment ->

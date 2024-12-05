@@ -20,6 +20,9 @@ class ReviewViewModel : ViewModel() {
 //    private val _comments = MutableLiveData<List<Comment>>()
 //    val comments: LiveData<List<Comment>> get() = _comments
 
+    var _userLike: Boolean = true
+    var _likeCount: Int = 0
+
     // 상태 관리
     private val _sharedData = MutableStateFlow<CommentView?>(null)
     val sharedData: StateFlow<CommentView?> get() = _sharedData
@@ -31,8 +34,10 @@ class ReviewViewModel : ViewModel() {
     val isLoading: StateFlow<Boolean> = _isLoading
 
     // 상태 업데이트
-    fun updateData(commentData: CommentView) {
+    fun updateData(commentData: CommentView, userLike: Boolean, likeCount: Int) {
         _sharedData.value = commentData
+        _userLike = userLike
+        _likeCount = likeCount
     }
 
     fun createReview(userId:String, movieId:String, content:String, score:Float) {

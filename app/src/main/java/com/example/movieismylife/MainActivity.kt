@@ -130,7 +130,10 @@ class MainActivity : ComponentActivity() {
                             movieDetailViewModel=movieDetailViewModel,
                             movieReviewViewModel=movieReviewViewModel,
                             reviewViewModel=reviewViewModel,
-                            replyViewModel=replyViewModel
+                            replyViewModel=replyViewModel,
+                            onClickBackArrow = {
+                                navController.popBackStack()
+                            }
                         )
                     }
                     composable(
@@ -154,18 +157,25 @@ class MainActivity : ComponentActivity() {
                             onRequestLocationPermission = { requestLocationPermission() }
                         )
                     }
-                    composable("replyPage/{commentId}", arguments = listOf(
+                    composable("replyPage/{movieId}&{commentId}", arguments = listOf(
+                        navArgument("movieId") {
+                            type = NavType.StringType
+                        },
                         navArgument("commentId") {
                             type = NavType.StringType
                         }
                     )) {
+                        val movieId = it.arguments?.getString("movieId") ?: ""
                         val commentId = it.arguments?.getString("commentId") ?: ""
                         ReplyPage(
                             navController = navController,
                             reviewViewModel = reviewViewModel,
                             replyViewModel = replyViewModel,
                             movieDetailViewModel = movieDetailViewModel,
-                            commentId = commentId
+                            onClickBackArrow = {
+                                navController.popBackStack()
+                                reviewViewModel.loadComments(movieId = movieId, userId = "2")
+                            }
                         ) }
                     composable("theaterPage") { TheaterPage(
                         navController,

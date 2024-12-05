@@ -103,8 +103,8 @@ fun MovieDetailReviews(
                                 if (userLike) {
                                     userLike = false
                                     likeCount -= 1
-                                    reviewViewModel.deleteLikeUser(userId = "1", commentId = review.commentId)
-                                    reviewViewModel.deleteUserLike(userId = "1", commentId = review.commentId)
+                                    reviewViewModel.deleteLikeUser(userId = "2", commentId = review.commentId)
+                                    reviewViewModel.deleteUserLike(userId = "2", commentId = review.commentId)
                                 } else {
                                     userLike = true
                                     likeCount += 1
@@ -181,9 +181,9 @@ fun MovieDetailReviews(
                 ) {
                     OutlinedButton(
                         onClick = {
-                            navController.navigate("replyPage/${review.commentId}") // reply create할 때 ReplyPage에서 사용
+                            navController.navigate("replyPage/${review.movieId}&${review.commentId}") // reply create할 때 ReplyPage에서 사용
                             replyViewModel.loadReplies(commentId = review.commentId)
-//                            reviewViewModel.updateData(review)
+                            reviewViewModel.updateData(review, userLike, likeCount)
                         },
                         colors = ButtonDefaults.buttonColors(containerColor = Color.Gray),
                         modifier = Modifier.height(36.dp)

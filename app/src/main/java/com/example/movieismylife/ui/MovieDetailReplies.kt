@@ -51,10 +51,10 @@ fun MovieDetailReplies(
         Card(
             modifier = Modifier
                 .fillMaxWidth()
-                .height(200.dp),
+                .height(140.dp),
             shape = RectangleShape,
             colors = CardDefaults.cardColors(
-                containerColor = Color.Gray,
+                containerColor = Color.Black,
             ),
         ) {
             Column(
