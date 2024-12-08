@@ -77,7 +77,7 @@ class MainActivity : ComponentActivity() {
                 val replyViewModel = viewModel<ReplyViewModel>()
                 val signUpViewModel = viewModel<SignUpViewModel>()
                 val signInViewModel = viewModel<SignInViewModel>()
-                val userViewModel = viewModel<UserViewModel>()
+                val myPageViewModel = viewModel<MyPageViewModel>()
 
                 val mapViewModel: MapViewModel = viewModel(
                     factory = viewModelFactory {
@@ -113,6 +113,7 @@ class MainActivity : ComponentActivity() {
                         SignInPage(
                             navController=navController,
                             signInViewModel=signInViewModel
+//                            userViewModel=userViewModel
                         )
                     }
                     composable(route = "signup"){
@@ -234,6 +235,15 @@ class MainActivity : ComponentActivity() {
                             navController.popBackStack()
                         })
                     }
+                    composable(route = "reviewWrite") {
+                        ReviewWritePage(navController = navController)
+                    }
+//                    composable(route = "my",
+//                        enterTransition = { slideInHorizontally() },
+//                        exitTransition = { slideOutHorizontally() }
+//                    ) {
+//                        MyPage(navController = navController)
+//                    }
                 }
             }
         }

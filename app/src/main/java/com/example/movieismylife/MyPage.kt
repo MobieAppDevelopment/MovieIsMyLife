@@ -1,5 +1,6 @@
 package com.example.movieismylife
 
+import android.util.Log
 import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.*
@@ -14,8 +15,11 @@ import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.navigation.NavController
+import com.example.movieismylife.viewmodel.MovieDetailViewModel
+import com.example.movieismylife.viewmodel.MovieReviewViewModel
 import com.example.movieismylife.viewmodel.MyPageViewModel
 import com.example.movieismylife.viewmodel.ReviewViewModel
+import com.example.movieismylife.viewmodel.ReplyViewModel
 import com.example.movieismylife.viewmodel.SignInState
 import com.example.movieismylife.viewmodel.SignInViewModel
 
@@ -26,7 +30,7 @@ fun MyPage(
     signInViewModel: SignInViewModel,
     reviewViewModel: ReviewViewModel
     ) {
-    val uiState = signInViewModel.state.collectAsState()
+    val uiState by signInViewModel.state.collectAsState()
 
     Scaffold(
         modifier = Modifier.fillMaxSize(),
@@ -42,7 +46,18 @@ fun MyPage(
                     .padding(16.dp)
             ) {
                 // Profile Section (Same as before)
-                ProfileSection()
+                when (val state = uiState) {
+                    is SignInState.Success -> {
+                        val user = state.user
+                        Log.d("test", user.name)
+                        Log.d("test", user.id)
+                        ProfileSection() // user.name, user.id
+                    }
+
+                    is SignInState.Error -> {}
+                    is SignInState.Loading -> {}
+                    is SignInState.Nothing -> {Log.d("now", "nothing")}
+                }
 
                 // Stats Section (Same as before)
                 StatsSection()
@@ -50,7 +65,11 @@ fun MyPage(
                 // Review Sections (Now with click handlers)
                 ReviewSection(
                     title = "작성한 리뷰",
-                    count = "0",
+                    count = if(signInViewModel.myComments.value == null) {
+                        "0"
+                    } else {
+                        signInViewModel.myComments.value?.size.toString()
+                    },
                     onClick = {
                         navController.navigate("writtenReviews/${"2"}")
                         reviewViewModel.loadMyComments(userId = "2")
@@ -58,7 +77,7 @@ fun MyPage(
                 )
                 ReviewSection(
                     title = "좋아요한 리뷰",
-                    count = "0",
+                    count = signInViewModel.likeComments.value?.size.toString(),
                     onClick = {
                         navController.navigate("likedReviews/${"2"}")
                         reviewViewModel.loadMyLikeComments(userId = "2")

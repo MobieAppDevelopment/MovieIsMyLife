@@ -88,6 +88,7 @@ class ReviewViewModel : ViewModel() {
 
     // 댓글을 비동기적으로 불러오는 함수
     fun loadComments(movieId: String, userId: String) { // userId: 로그인돼있는 유저
+        Log.d("movieId", movieId)
         viewModelScope.launch {
             _isLoading.value = true
             _comments.value = emptyList()
@@ -106,13 +107,12 @@ class ReviewViewModel : ViewModel() {
                 for (document in querySnapshot) {
                     val documentId = document.id
                     val comment = document.toObject(Comment::class.java)
-
+                    Log.d("check^^", comment.content)
                     // Firestore에서 사용자 정보 가져오기
                     val (name, profile) = fetchName(comment.userId)
 
                     // Firestore에서 좋아요 정보 가져오기
                     val userLike = fetchUserLike(userId, documentId) // userId: 로그인돼있는 유저
-                    Log.d("wtf", "${userLike}")
 
                     // 좋아요 개수 카운트
                     var likeCount = 0

@@ -12,7 +12,7 @@ data class Comment(
 //    val profile: String = "",
 //    val title: String = "",
 //    val posterImage: String = "",
-    val createdAt: Timestamp,
+    val createdAt: Timestamp = Timestamp(0, 0), // 왜 초기화를 안시키면 안되는가, 무조건 초기화해야되나?
     val movieTitle: String = "",
     val moviePoster: String = "",
 )
