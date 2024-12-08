@@ -1,5 +1,6 @@
 package com.example.movieismylife
 
+import android.util.Log
 import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.*
@@ -24,7 +25,7 @@ fun MyPage(
     myPageViewModel: MyPageViewModel,
     signInViewModel: SignInViewModel
     ) {
-    val uiState = signInViewModel.state.collectAsState()
+    val uiState by signInViewModel.state.collectAsState()
 
     Scaffold(
         modifier = Modifier.fillMaxSize(),
@@ -40,7 +41,18 @@ fun MyPage(
                     .padding(16.dp)
             ) {
                 // Profile Section (Same as before)
-                ProfileSection()
+                when (val state = uiState) {
+                    is SignInState.Success -> {
+                        val user = state.user
+                        Log.d("test", user.name)
+                        Log.d("test", user.id)
+                        ProfileSection(user.name, user.id)
+                    }
+
+                    is SignInState.Error -> {}
+                    is SignInState.Loading -> {}
+                    is SignInState.Nothing -> {Log.d("now", "nothing")}
+                }
 
                 // Stats Section (Same as before)
                 StatsSection()
@@ -62,7 +74,7 @@ fun MyPage(
 }
 
 @Composable
-fun ProfileSection() {
+fun ProfileSection(name: String, id: String) {
     Column(
         horizontalAlignment = Alignment.CenterHorizontally,
         modifier = Modifier.fillMaxWidth()
@@ -74,7 +86,7 @@ fun ProfileSection() {
                 .background(Color(0xFF3B4155))
         ) {
             Text(
-                text = "강",
+                text = name.substring(0 until 1),
                 color = Color.White,
                 fontSize = 32.sp,
                 modifier = Modifier.align(Alignment.Center)
@@ -82,7 +94,7 @@ fun ProfileSection() {
         }
 
         Text(
-            text = "강인한_크리스토퍼_626559",
+            text = name,
             color = Color.White,
             fontSize = 20.sp,
             fontWeight = FontWeight.Bold,
@@ -90,7 +102,7 @@ fun ProfileSection() {
         )
 
         Text(
-            text = "ID 398165",
+            text = "ID ${id}",
             color = Color.Gray,
             fontSize = 14.sp,
             modifier = Modifier.padding(top = 4.dp)
