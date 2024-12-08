@@ -1,5 +1,7 @@
 package com.example.movieismylife.model
 
+import com.google.firebase.Timestamp
+
 // 댓글 데이터 모델
 data class Comment(
     val userId: String = "",
@@ -10,5 +12,7 @@ data class Comment(
 //    val profile: String = "",
 //    val title: String = "",
 //    val posterImage: String = "",
-    val createdAt: Long = 0
+    val createdAt: Timestamp,
+    val movieTitle: String = "",
+    val moviePoster: String = "",
 )

@@ -1,5 +1,6 @@
 package com.example.movieismylife
 
+import android.util.Log
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
@@ -26,15 +27,15 @@ import com.google.android.libraries.places.api.model.Review
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
-fun MovieReviewManagementPage(
+fun MovieLikeReviewManagementPage(
     navController: NavController,
     userId: String,
     reviewViewModel: ReviewViewModel,
     onClickBackArrow: () -> Unit,
     ) {
-    val myComments by reviewViewModel.myComments.collectAsState()
+    val myLikeComments by reviewViewModel.myLikeComments.collectAsState()
     val sortOption by reviewViewModel.sortOption.collectAsState(initial = SortOption.LATEST)
-    val reviewType by reviewViewModel.reviewType.collectAsState(initial = "MY REVIEW")
+    val reviewType by reviewViewModel.reviewType.collectAsState(initial = "LIKE REVIEW")
 
 //    val reviews by movieReviewViewModel.reviews.collectAsState()
 //    val sortOption by movieReviewViewModel.sortOption.collectAsState()
@@ -68,7 +69,7 @@ fun MovieReviewManagementPage(
                         )
                     }
                     Text(
-                        text = "MY REVIEW",
+                        text = "LIKE REVIEW",
                         style = MaterialTheme.typography.titleLarge,
                         fontWeight = FontWeight.Bold,
                         color = Color.White
@@ -100,10 +101,13 @@ fun MovieReviewManagementPage(
                             onDismissRequest = { expanded = false }) {
                             DropdownMenuItem(text = { Text("최신순") }, onClick = {
                                 reviewViewModel.setSortOption(SortOption.LATEST, reviewType)
+//                                reviewViewModel.loadMyLikeComments(userId = "2")
                                 expanded = false
+                                Log.d("wtf", "chec^^")
                             })
                             DropdownMenuItem(text = { Text("별점순") }, onClick = {
                                 reviewViewModel.setSortOption(SortOption.RATING, reviewType)
+//                                reviewViewModel.loadMyLikeComments(userId = "2")
                                 expanded = false
                             })
                         }
@@ -113,8 +117,8 @@ fun MovieReviewManagementPage(
                     modifier = Modifier.fillMaxSize(),
                     verticalArrangement = Arrangement.spacedBy(4.dp)
                 ) {
-                    items(myComments) { myComment ->
-                        ReviewItem(myComment = myComment)
+                    items(myLikeComments) { myLikeComment ->
+                        ReviewItem(myComment = myLikeComment)
                     }
                 }
             }

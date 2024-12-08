@@ -15,6 +15,7 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.navigation.NavController
 import com.example.movieismylife.viewmodel.MyPageViewModel
+import com.example.movieismylife.viewmodel.ReviewViewModel
 import com.example.movieismylife.viewmodel.SignInState
 import com.example.movieismylife.viewmodel.SignInViewModel
 
@@ -22,7 +23,8 @@ import com.example.movieismylife.viewmodel.SignInViewModel
 fun MyPage(
     navController: NavController,
     myPageViewModel: MyPageViewModel,
-    signInViewModel: SignInViewModel
+    signInViewModel: SignInViewModel,
+    reviewViewModel: ReviewViewModel
     ) {
     val uiState = signInViewModel.state.collectAsState()
 
@@ -49,12 +51,18 @@ fun MyPage(
                 ReviewSection(
                     title = "작성한 리뷰",
                     count = "0",
-                    onClick = { navController.navigate("writtenReviews") }
+                    onClick = {
+                        navController.navigate("writtenReviews/${"2"}")
+                        reviewViewModel.loadMyComments(userId = "2")
+                    }
                 )
                 ReviewSection(
                     title = "좋아요한 리뷰",
                     count = "0",
-                    onClick = { navController.navigate("likedReviews") }
+                    onClick = {
+                        navController.navigate("likedReviews/${"2"}")
+                        reviewViewModel.loadMyLikeComments(userId = "2")
+                    }
                 )
             }
         }
