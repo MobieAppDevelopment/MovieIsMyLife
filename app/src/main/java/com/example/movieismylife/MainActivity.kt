@@ -11,19 +11,23 @@ import androidx.activity.result.contract.ActivityResultContracts
 import androidx.compose.animation.slideInHorizontally
 import androidx.compose.animation.slideOutHorizontally
 import androidx.compose.runtime.LaunchedEffect
+import androidx.compose.runtime.collectAsState
 import androidx.core.content.ContextCompat
 import androidx.lifecycle.viewmodel.compose.viewModel
 import androidx.lifecycle.viewmodel.initializer
 import androidx.lifecycle.viewmodel.viewModelFactory
+import androidx.navigation.NavType
 import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
 import androidx.navigation.compose.rememberNavController
+import androidx.navigation.navArgument
 import com.example.movieismylife.model.LocationDataManager
 import com.example.movieismylife.ui.theme.MovieIsMyLifeTheme
 import com.example.movieismylife.viewmodel.MapViewModel
 import com.example.movieismylife.viewmodel.MovieDetailViewModel
 import com.example.movieismylife.viewmodel.MovieListViewModel
 import com.example.movieismylife.viewmodel.MovieReviewViewModel
+import com.example.movieismylife.viewmodel.ReplyViewModel
 import com.example.movieismylife.viewmodel.MyPageViewModel
 import com.example.movieismylife.viewmodel.ReviewViewModel
 import com.example.movieismylife.viewmodel.SignInViewModel
@@ -70,6 +74,7 @@ class MainActivity : ComponentActivity() {
                 val movieDetailViewModel = viewModel<MovieDetailViewModel>()
                 val movieReviewViewModel = viewModel<MovieReviewViewModel>()
                 val reviewViewModel = viewModel<ReviewViewModel>()
+                val replyViewModel = viewModel<ReplyViewModel>()
                 val signUpViewModel = viewModel<SignUpViewModel>()
                 val signInViewModel = viewModel<SignInViewModel>()
                 val myPageViewModel = viewModel<MyPageViewModel>()
@@ -133,7 +138,11 @@ class MainActivity : ComponentActivity() {
                             navController=navController,
                             movieDetailViewModel=movieDetailViewModel,
                             movieReviewViewModel=movieReviewViewModel,
-                            reviewViewModel=reviewViewModel
+                            reviewViewModel=reviewViewModel,
+                            replyViewModel=replyViewModel,
+                            onClickBackArrow = {
+                                navController.popBackStack()
+                            }
                         )
                     }
                     composable(
@@ -157,6 +166,31 @@ class MainActivity : ComponentActivity() {
                             onRequestLocationPermission = { requestLocationPermission() }
                         )
                     }
+                    composable("replyPage/{movieId}&{commentId}", arguments = listOf(
+                        navArgument("movieId") {
+                            type = NavType.StringType
+                        },
+                        navArgument("commentId") {
+                            type = NavType.StringType
+                        }
+                    )) {
+                        val movieId = it.arguments?.getString("movieId") ?: ""
+                        val commentId = it.arguments?.getString("commentId") ?: ""
+                        ReplyPage(
+                            navController = navController,
+                            reviewViewModel = reviewViewModel,
+                            replyViewModel = replyViewModel,
+                            movieDetailViewModel = movieDetailViewModel,
+                            onClickBackArrow = {
+                                navController.popBackStack()
+                                reviewViewModel.loadComments(movieId = movieId, userId = "2")
+                            },
+                            commentId = commentId
+                        ) }
+                    composable("theaterPage") { TheaterPage(
+                        navController,
+                        movieDetailViewModel
+                    ) }
                     composable(route = "my",
                         enterTransition = { slideInHorizontally() },
                         exitTransition = { slideOutHorizontally() }
