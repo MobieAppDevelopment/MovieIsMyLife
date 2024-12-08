@@ -60,12 +60,16 @@ fun MyPage(
                 // Review Sections (Now with click handlers)
                 ReviewSection(
                     title = "작성한 리뷰",
-                    count = "0",
+                    count = if(signInViewModel.myComments.value == null) {
+                        "0"
+                    } else {
+                        signInViewModel.myComments.value?.size.toString()
+                    },
                     onClick = { navController.navigate("writtenReviews") }
                 )
                 ReviewSection(
                     title = "좋아요한 리뷰",
-                    count = "0",
+                    count = signInViewModel.likeComments.value?.size.toString(),
                     onClick = { navController.navigate("likedReviews") }
                 )
             }
