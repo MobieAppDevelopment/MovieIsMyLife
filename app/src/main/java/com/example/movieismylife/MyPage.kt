@@ -15,15 +15,22 @@ import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.navigation.NavController
+import com.example.movieismylife.viewmodel.MovieDetailViewModel
+import com.example.movieismylife.viewmodel.MovieReviewViewModel
 import com.example.movieismylife.viewmodel.MyPageViewModel
+import com.example.movieismylife.viewmodel.ReplyViewModel
+import com.example.movieismylife.viewmodel.ReviewViewModel
 import com.example.movieismylife.viewmodel.SignInState
 import com.example.movieismylife.viewmodel.SignInViewModel
 
 @Composable
 fun MyPage(
     navController: NavController,
-    myPageViewModel: MyPageViewModel,
-    signInViewModel: SignInViewModel
+    signInViewModel: SignInViewModel,
+    reviewViewModel: ReviewViewModel,
+    movieDetailViewModel: MovieDetailViewModel,
+    movieReviewViewModel: MovieReviewViewModel,
+    replyViewModel: ReplyViewModel
     ) {
     val uiState by signInViewModel.state.collectAsState()
 

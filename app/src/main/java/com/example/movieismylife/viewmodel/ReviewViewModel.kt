@@ -40,7 +40,7 @@ class ReviewViewModel : ViewModel() {
         _likeCount = likeCount
     }
 
-    fun createReview(userId:String, movieId:String, content:String, score:Float) {
+    fun createReview(userId:String, movieId:String, content:String, score:Long) {
         // Firestore 인스턴스 가져오기
         val db = FirebaseFirestore.getInstance()
 

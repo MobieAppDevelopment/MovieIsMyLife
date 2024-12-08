@@ -1,7 +1,7 @@
 package com.example.movieismylife.model
 
 data class CommentView (
-    val score: Float = 0f,
+    val score: Long = 0,
     val content: String = "",
     val name: String = "",
     val profile: String = "",
