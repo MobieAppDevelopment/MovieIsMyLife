@@ -7,6 +7,7 @@ import com.example.movieismylife.model.Comment
 import com.example.movieismylife.model.CommentView
 import com.example.movieismylife.model.Reply
 import com.example.movieismylife.model.ReplyView
+import com.google.firebase.Timestamp
 import com.google.firebase.firestore.FirebaseFirestore
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
@@ -33,7 +34,7 @@ class ReplyViewModel : ViewModel() {
             userId = userId,
             commentId = commentId ?: "",
             content = content,
-            createdAt = System.currentTimeMillis()
+            createdAt = Timestamp.now()
         )
 
 //        // 'movies' 컬렉션에서 'movie_id' 문서 내 'comments' 서브컬렉션에 댓글 추가

@@ -83,7 +83,7 @@ class SignInViewModel : ViewModel() {
                                 content = document.getString("content") ?: "",
                                 createdAt = document.getTimestamp("createdAt")!!,
                                 movieId = document.getString("movieId") ?: "",
-                                score = document.getLong("score")!!.toFloat(),
+                                score = document.getLong("score") ?: 0,
                                 userId = document.getString("userId") ?: ""
                             )
                             comment
@@ -120,7 +120,7 @@ class SignInViewModel : ViewModel() {
                                 content = document.getString("content") ?: "",
                                 createdAt = document.getTimestamp("createdAt") ?: Timestamp.now(),
                                 movieId = document.getString("movieId") ?: "",
-                                score = document.getLong("score")!!.toFloat() ?: 0f,
+                                score = document.getLong("score") ?: 0,
                                 userId = document.getString("userId") ?: ""
                             )
                         }

@@ -14,12 +14,24 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.navigation.NavController
 import androidx.compose.material3.Switch
+import com.example.movieismylife.viewmodel.ReviewViewModel
+import com.example.movieismylife.viewmodel.SignInState
+import com.example.movieismylife.viewmodel.SignInViewModel
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
-fun ReviewWritePage(navController: NavController) {
+fun ReviewWritePage(
+    navController: NavController,
+    reviewViewModel: ReviewViewModel,
+    signInViewModel: SignInViewModel,
+    movieId: String
+    ) {
     var reviewText by remember { mutableStateOf("") }
     var isPrivate by remember { mutableStateOf(false) }
+    val uiState by signInViewModel.state.collectAsState()
+    val getUserId = (uiState as? SignInState.Success)?.user?.id ?: -1
+    val userId = getUserId.toString()
+    val score = reviewViewModel._score
 
     Surface(
         modifier = Modifier.fillMaxSize(),
@@ -48,7 +60,11 @@ fun ReviewWritePage(navController: NavController) {
                 },
                 actions = {
                     TextButton(
-                        onClick = { /* Handle save */ },
+                        onClick = {
+                            navController.popBackStack()
+                            reviewViewModel.createReview(userId = userId, movieId = movieId, content = reviewText, score = score)
+                            reviewViewModel.loadComments(movieId = movieId, userId = userId)
+                                  },
                         enabled = reviewText.isNotEmpty()
                     ) {
                         Text(

@@ -90,7 +90,7 @@ fun ReviewItem(myComment: CommentView) {
 }
 
 @Composable
-fun RatingBar(rating: Float, maxRating: Int = 5) {
+fun RatingBar(rating: Long, maxRating: Int = 5) {
     Row {
         repeat(maxRating) { index ->
             Icon(

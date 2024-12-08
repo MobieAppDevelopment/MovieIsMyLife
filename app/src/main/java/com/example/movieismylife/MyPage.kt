@@ -20,19 +20,21 @@ import androidx.navigation.NavController
 import com.example.movieismylife.viewmodel.MovieDetailViewModel
 import com.example.movieismylife.viewmodel.MovieReviewViewModel
 import com.example.movieismylife.viewmodel.MyPageViewModel
-import com.example.movieismylife.viewmodel.ReviewViewModel
 import com.example.movieismylife.viewmodel.ReplyViewModel
+import com.example.movieismylife.viewmodel.ReviewViewModel
 import com.example.movieismylife.viewmodel.SignInState
 import com.example.movieismylife.viewmodel.SignInViewModel
 
 @Composable
 fun MyPage(
     navController: NavController,
-    myPageViewModel: MyPageViewModel,
     signInViewModel: SignInViewModel,
+    myPageViewModel: MyPageViewModel,
     reviewViewModel: ReviewViewModel
     ) {
     val uiState by signInViewModel.state.collectAsState()
+    val getUserId = (uiState as? SignInState.Success)?.user?.id ?: -1
+    val userId = getUserId.toString()
 
     Scaffold(
         modifier = Modifier.fillMaxSize(),
@@ -53,7 +55,7 @@ fun MyPage(
                         val user = state.user
                         Log.d("test", user.name)
                         Log.d("test", user.id)
-                        ProfileSection() // user.name, user.id
+                        ProfileSection(user.name, user.id)
                     }
 
                     is SignInState.Error -> {}
@@ -73,16 +75,16 @@ fun MyPage(
                         signInViewModel.myComments.value?.size.toString()
                     },
                     onClick = {
-                        navController.navigate("writtenReviews/${"2"}")
-                        reviewViewModel.loadMyComments(userId = "2")
+                        navController.navigate("writtenReviews/${userId}")
+                        reviewViewModel.loadMyComments(userId = userId)
                     }
                 )
                 ReviewSection(
                     title = "좋아요한 리뷰",
                     count = signInViewModel.likeComments.value?.size.toString(),
                     onClick = {
-                        navController.navigate("likedReviews/${"2"}")
-                        reviewViewModel.loadMyLikeComments(userId = "2")
+                        navController.navigate("likedReviews/${userId}")
+                        reviewViewModel.loadMyLikeComments(userId = userId)
                     }
                 )
 
@@ -108,7 +110,7 @@ fun MyPage(
 }
 
 @Composable
-fun ProfileSection() {
+fun ProfileSection(name: String, id: String) {
     Column(
         horizontalAlignment = Alignment.CenterHorizontally,
         modifier = Modifier.fillMaxWidth()
@@ -120,7 +122,7 @@ fun ProfileSection() {
                 .background(Color(0xFF3B4155))
         ) {
             Text(
-                text = "강",
+                text = name.substring(0 until 1),
                 color = Color.White,
                 fontSize = 32.sp,
                 modifier = Modifier.align(Alignment.Center)
@@ -128,7 +130,7 @@ fun ProfileSection() {
         }
 
         Text(
-            text = "강인한_크리스토퍼_626559",
+            text = name,
             color = Color.White,
             fontSize = 20.sp,
             fontWeight = FontWeight.Bold,
@@ -136,7 +138,7 @@ fun ProfileSection() {
         )
 
         Text(
-            text = "ID 398165",
+            text = "ID ${id}",
             color = Color.Gray,
             fontSize = 14.sp,
             modifier = Modifier.padding(top = 4.dp)

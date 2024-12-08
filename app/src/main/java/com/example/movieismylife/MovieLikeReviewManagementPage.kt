@@ -101,13 +101,11 @@ fun MovieLikeReviewManagementPage(
                             onDismissRequest = { expanded = false }) {
                             DropdownMenuItem(text = { Text("최신순") }, onClick = {
                                 reviewViewModel.setSortOption(SortOption.LATEST, reviewType)
-//                                reviewViewModel.loadMyLikeComments(userId = "2")
                                 expanded = false
                                 Log.d("wtf", "chec^^")
                             })
                             DropdownMenuItem(text = { Text("별점순") }, onClick = {
                                 reviewViewModel.setSortOption(SortOption.RATING, reviewType)
-//                                reviewViewModel.loadMyLikeComments(userId = "2")
                                 expanded = false
                             })
                         }

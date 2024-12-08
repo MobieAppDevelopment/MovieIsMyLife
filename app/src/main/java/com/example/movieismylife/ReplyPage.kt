@@ -56,6 +56,8 @@ import com.example.movieismylife.ui.getColorFromString
 import com.example.movieismylife.viewmodel.MovieDetailViewModel
 import com.example.movieismylife.viewmodel.ReplyViewModel
 import com.example.movieismylife.viewmodel.ReviewViewModel
+import com.example.movieismylife.viewmodel.SignInState
+import com.example.movieismylife.viewmodel.SignInViewModel
 import kotlinx.coroutines.flow.StateFlow
 
 
@@ -65,6 +67,7 @@ fun ReplyPage(
     reviewViewModel: ReviewViewModel,
     replyViewModel: ReplyViewModel,
     movieDetailViewModel: MovieDetailViewModel,
+    signInViewModel: SignInViewModel,
     onClickBackArrow: () -> Unit,
     commentId: String
     ) {
@@ -75,6 +78,9 @@ fun ReplyPage(
         mutableStateOf("")
     }
     val keyboardController = LocalSoftwareKeyboardController.current // 키보드 컨트롤러
+    val uiState by signInViewModel.state.collectAsState()
+    val getUserId = (uiState as? SignInState.Success)?.user?.id ?: -1
+    val userId = getUserId.toString()
 
 //    replyViewModel.createReply("1", comment?.movieId ?: "", comment?.commentId ?: "", "I think so too")
     // 데이터 로딩 함수 호출을 제어
@@ -101,7 +107,7 @@ fun ReplyPage(
                         tint = Color.White
                     )
                 }
-                commentDetail(reviewViewModel = reviewViewModel, movieDetailViewModel = movieDetailViewModel)
+                commentDetail(reviewViewModel = reviewViewModel, movieDetailViewModel = movieDetailViewModel, signInViewModel = signInViewModel)
                 Row(
 
                 ) {
@@ -126,7 +132,7 @@ fun ReplyPage(
                         keyboardActions = KeyboardActions(
                             onDone = {
                                 // 엔터 키 동작 정의
-                                replyViewModel.createReply(userId = "2", commentId = commentId, content = content) // 콜백 호출
+                                replyViewModel.createReply(userId = userId, commentId = commentId, content = content) // 콜백 호출
                                 replyViewModel.loadReplies(commentId = commentId)
                                 content = ""
                                 keyboardController?.hide() // 키보드 숨기기
@@ -151,11 +157,15 @@ fun ReplyPage(
 fun commentDetail(
     reviewViewModel: ReviewViewModel,
     movieDetailViewModel: MovieDetailViewModel,
+    signInViewModel: SignInViewModel
 ) {
     val comment by reviewViewModel.sharedData.collectAsState()
     val movieDetail = movieDetailViewModel._movieDetail.value
     var userLike by remember{ mutableStateOf(reviewViewModel._userLike) }
     var likeCount by remember{ mutableStateOf(reviewViewModel._likeCount) }
+    val uiState by signInViewModel.state.collectAsState()
+    val getUserId = (uiState as? SignInState.Success)?.user?.id ?: -1
+    val userId = getUserId.toString()
 
     Card(
         modifier = Modifier
@@ -205,13 +215,13 @@ fun commentDetail(
                                     if (userLike) {
                                         userLike = false
                                         likeCount -= 1
-                                        reviewViewModel.deleteLikeUser(userId = "2", commentId = comment!!.commentId)
-                                        reviewViewModel.deleteUserLike(userId = "2", commentId = comment!!.commentId)
+                                        reviewViewModel.deleteLikeUser(userId = userId, commentId = comment!!.commentId)
+                                        reviewViewModel.deleteUserLike(userId = userId, commentId = comment!!.commentId)
                                     } else {
                                         userLike = true
                                         likeCount += 1
-                                        reviewViewModel.createLike(userId = "2", comment!!.commentId)
-                                        reviewViewModel.createUserLike(userId = "2", commentId = comment!!.commentId, movieTitle = movieDetail!!.title, moviePoster = movieDetail.posterPath ?: "") // 왜 moviePoster에는 !!가 안되고 ?: ""를 써야 되나?
+                                        reviewViewModel.createLike(userId = userId, comment!!.commentId)
+                                        reviewViewModel.createUserLike(userId = userId, commentId = comment!!.commentId, movieTitle = movieDetail!!.title, moviePoster = movieDetail.posterPath ?: "") // 왜 moviePoster에는 !!가 안되고 ?: ""를 써야 되나?
                                     }
 
                                 })
