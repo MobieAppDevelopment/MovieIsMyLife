@@ -12,6 +12,7 @@ import androidx.compose.animation.slideInHorizontally
 import androidx.compose.animation.slideOutHorizontally
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.collectAsState
+import androidx.compose.runtime.getValue
 import androidx.core.content.ContextCompat
 import androidx.lifecycle.viewmodel.compose.viewModel
 import androidx.lifecycle.viewmodel.initializer
@@ -30,6 +31,7 @@ import com.example.movieismylife.viewmodel.MovieReviewViewModel
 import com.example.movieismylife.viewmodel.ReplyViewModel
 import com.example.movieismylife.viewmodel.MyPageViewModel
 import com.example.movieismylife.viewmodel.ReviewViewModel
+import com.example.movieismylife.viewmodel.SignInState
 import com.example.movieismylife.viewmodel.SignInViewModel
 import com.example.movieismylife.viewmodel.SignUpViewModel
 //import com.example.movieismylife.viewmodel.UserViewModel
@@ -77,6 +79,22 @@ class MainActivity : ComponentActivity() {
                 val replyViewModel = viewModel<ReplyViewModel>()
                 val signUpViewModel = viewModel<SignUpViewModel>()
                 val signInViewModel = viewModel<SignInViewModel>()
+                val uiState by signInViewModel.state.collectAsState()
+                val getUserId = (uiState as? SignInState.Success)?.user?.id ?: -1
+                val userId = getUserId.toString()
+
+                // Profile Section (Same as before)
+                when (val state = uiState) {
+                    is SignInState.Success -> {
+                        val user = state.user
+                        Log.d("test", user.name)
+                        Log.d("test", user.id)
+                    }
+
+                    is SignInState.Error -> {}
+                    is SignInState.Loading -> {}
+                    is SignInState.Nothing -> {Log.d("now", "nothing")}
+                }
 
                 val mapViewModel: MapViewModel = viewModel(
                     factory = viewModelFactory {
@@ -130,6 +148,8 @@ class MainActivity : ComponentActivity() {
                             movieListViewModel = movieListViewModel,
                             movieDetailViewModel = movieDetailViewModel,
                             navController=navController,
+                            reviewViewModel = reviewViewModel,
+                            signInViewModel = signInViewModel
                         )
                     }
                     composable(route = "detail"){
@@ -139,6 +159,7 @@ class MainActivity : ComponentActivity() {
                             movieReviewViewModel=movieReviewViewModel,
                             reviewViewModel=reviewViewModel,
                             replyViewModel=replyViewModel,
+                            signInViewModel=signInViewModel,
                             onClickBackArrow = {
                                 navController.popBackStack()
                             }
@@ -180,9 +201,10 @@ class MainActivity : ComponentActivity() {
                             reviewViewModel = reviewViewModel,
                             replyViewModel = replyViewModel,
                             movieDetailViewModel = movieDetailViewModel,
+                            signInViewModel = signInViewModel,
                             onClickBackArrow = {
                                 navController.popBackStack()
-                                reviewViewModel.loadComments(movieId = movieId, userId = "2")
+                                reviewViewModel.loadComments(movieId = movieId, userId = userId)
                             },
                             commentId = commentId
                         ) }
@@ -236,8 +258,18 @@ class MainActivity : ComponentActivity() {
                             })
                     }
 
-                    composable(route = "reviewWrite") {
-                        ReviewWritePage(navController = navController)
+                    composable(route = "reviewWrite/{movieId}", arguments = listOf(
+                        navArgument("movieId") {
+                            type = NavType.StringType
+                        }),
+                        ) {
+                        val movieId = it.arguments?.getString("movieId") ?: ""
+                        ReviewWritePage(
+                            navController = navController,
+                            reviewViewModel = reviewViewModel,
+                            signInViewModel = signInViewModel,
+                            movieId = movieId
+                            )
                     }
 //                    composable(route = "my",
 //                        enterTransition = { slideInHorizontally() },

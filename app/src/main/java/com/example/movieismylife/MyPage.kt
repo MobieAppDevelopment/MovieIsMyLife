@@ -33,6 +33,8 @@ fun MyPage(
     reviewViewModel: ReviewViewModel
     ) {
     val uiState by signInViewModel.state.collectAsState()
+    val getUserId = (uiState as? SignInState.Success)?.user?.id ?: -1
+    val userId = getUserId.toString()
 
     Scaffold(
         modifier = Modifier.fillMaxSize(),
@@ -73,16 +75,16 @@ fun MyPage(
                         signInViewModel.myComments.value?.size.toString()
                     },
                     onClick = {
-                        navController.navigate("writtenReviews/${"2"}")
-                        reviewViewModel.loadMyComments(userId = "2")
+                        navController.navigate("writtenReviews/${userId}")
+                        reviewViewModel.loadMyComments(userId = userId)
                     }
                 )
                 ReviewSection(
                     title = "좋아요한 리뷰",
                     count = signInViewModel.likeComments.value?.size.toString(),
                     onClick = {
-                        navController.navigate("likedReviews/${"2"}")
-                        reviewViewModel.loadMyLikeComments(userId = "2")
+                        navController.navigate("likedReviews/${userId}")
+                        reviewViewModel.loadMyLikeComments(userId = userId)
                     }
                 )
 

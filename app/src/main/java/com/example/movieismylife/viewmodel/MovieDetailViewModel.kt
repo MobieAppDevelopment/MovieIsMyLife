@@ -39,7 +39,6 @@ class MovieDetailViewModel : ViewModel() {
     // 어떤 주소를 입력했다!
     private val api = retrofit.create(ApiService::class.java)
 
-    // 인기 있는 영화 20개를 popularMovieList에 가져온다
     fun fetchMovieDetail(movieid:Int = 912649) {
         viewModelScope.launch {
             try {

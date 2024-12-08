@@ -1,5 +1,6 @@
 package com.example.movieismylife.ui
 
+import android.util.Log
 import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Box
@@ -23,6 +24,7 @@ import androidx.compose.material3.Icon
 import androidx.compose.material3.OutlinedButton
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
@@ -34,10 +36,13 @@ import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.RectangleShape
 import androidx.compose.ui.unit.dp
 import androidx.navigation.NavController
+import com.example.movieismylife.ProfileSection
 import com.example.movieismylife.model.CommentView
 import com.example.movieismylife.viewmodel.MovieDetailViewModel
 import com.example.movieismylife.viewmodel.ReplyViewModel
 import com.example.movieismylife.viewmodel.ReviewViewModel
+import com.example.movieismylife.viewmodel.SignInState
+import com.example.movieismylife.viewmodel.SignInViewModel
 
 @Composable
 fun MovieDetailReviews(
@@ -45,11 +50,15 @@ fun MovieDetailReviews(
     navController: NavController,
     reviewViewModel: ReviewViewModel,
     replyViewModel: ReplyViewModel,
-    movieDetailViewModel: MovieDetailViewModel
+    movieDetailViewModel: MovieDetailViewModel,
+    signInViewModel: SignInViewModel
 ) {
     val movieDetail = movieDetailViewModel._movieDetail.value
     var userLike by remember { mutableStateOf(review.userLike) }
     var likeCount by remember { mutableStateOf(review.likeCount) }
+    val uiState by signInViewModel.state.collectAsState()
+    val getUserId = (uiState as? SignInState.Success)?.user?.id ?: -1
+    val userId = getUserId.toString()
 
     Column(
         modifier = Modifier.fillMaxWidth()
@@ -94,7 +103,7 @@ fun MovieDetailReviews(
                         )
                         Spacer(
                             modifier = Modifier
-                                .width(190.dp)
+                                .width(200.dp)
                         )
                         Box(
                             modifier = Modifier
@@ -103,13 +112,13 @@ fun MovieDetailReviews(
                                 if (userLike) {
                                     userLike = false
                                     likeCount -= 1
-                                    reviewViewModel.deleteLikeUser(userId = "2", commentId = review.commentId)
-                                    reviewViewModel.deleteUserLike(userId = "2", commentId = review.commentId)
+                                    reviewViewModel.deleteLikeUser(userId = userId, commentId = review.commentId)
+                                    reviewViewModel.deleteUserLike(userId = userId, commentId = review.commentId)
                                 } else {
                                     userLike = true
                                     likeCount += 1
-                                    reviewViewModel.createLike(userId = "2", review.commentId)
-                                    reviewViewModel.createUserLike(userId = "2", commentId = review.commentId, movieTitle = movieDetail!!.title, moviePoster = movieDetail.posterPath ?: "") // 왜 moviePoster에는 !!가 안되고 ?: ""를 써야 되나?
+                                    reviewViewModel.createLike(userId = userId, review.commentId)
+                                    reviewViewModel.createUserLike(userId = userId, commentId = review.commentId, movieTitle = movieDetail!!.title, moviePoster = movieDetail.posterPath ?: "") // 왜 moviePoster에는 !!가 안되고 ?: ""를 써야 되나?
                                 }
 
                             })

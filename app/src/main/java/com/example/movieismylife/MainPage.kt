@@ -38,6 +38,8 @@ import androidx.compose.material3.Text
 import androidx.compose.material3.TopAppBar
 import androidx.compose.material3.TopAppBarDefaults
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.collectAsState
+import androidx.compose.runtime.getValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
@@ -50,19 +52,27 @@ import coil.compose.rememberAsyncImagePainter
 import com.example.movieismylife.model.Movies
 import com.example.movieismylife.viewmodel.MovieDetailViewModel
 import com.example.movieismylife.viewmodel.MovieListViewModel
+import com.example.movieismylife.viewmodel.ReviewViewModel
+import com.example.movieismylife.viewmodel.SignInState
+import com.example.movieismylife.viewmodel.SignInViewModel
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun MainPage(
     navController: NavController,
     movieListViewModel: MovieListViewModel,
-    movieDetailViewModel: MovieDetailViewModel
+    movieDetailViewModel: MovieDetailViewModel,
+    reviewViewModel: ReviewViewModel,
+    signInViewModel: SignInViewModel
 ) {
     // Sample data
     val popularMovies = movieListViewModel.popularMovieList.value
     val actionMovies = movieListViewModel.getGenreMovies(28)
     val comedyMovies = movieListViewModel.getGenreMovies(35)
     val familyMovies = movieListViewModel.getGenreMovies(10751)
+    val uiState by signInViewModel.state.collectAsState()
+    val getUserId = (uiState as? SignInState.Success)?.user?.id ?: -1
+    val userId = getUserId.toString()
 
     Scaffold(
         modifier = Modifier.fillMaxSize(),
@@ -110,6 +120,7 @@ fun MainPage(
                             rank = index,
                             clickDetailEvent = {
                                 movieDetailViewModel.fetchMovieDetail(it.id)
+                                reviewViewModel.calculateAverageScore(movieId = it.id.toString())
                                 navController.navigate("detail")
                             }
                         )
@@ -133,6 +144,7 @@ fun MainPage(
                             movie = movie,
                             clickDetailEvent = {
                                 movieDetailViewModel.fetchMovieDetail(it.id)
+                                reviewViewModel.calculateAverageScore(movieId = it.id.toString())
                                 navController.navigate("detail")
                             }
                         )
@@ -156,6 +168,7 @@ fun MainPage(
                             movie = movie,
                             clickDetailEvent = {
                                 movieDetailViewModel.fetchMovieDetail(it.id)
+                                reviewViewModel.calculateAverageScore(movieId = it.id.toString())
                                 navController.navigate("detail")
                             }
                         )
@@ -179,6 +192,7 @@ fun MainPage(
                             movie = movie,
                             clickDetailEvent = {
                                 movieDetailViewModel.fetchMovieDetail(it.id)
+                                reviewViewModel.calculateAverageScore(movieId = it.id.toString())
                                 navController.navigate("detail")
                             }
                         )

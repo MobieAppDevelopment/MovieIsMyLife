@@ -81,7 +81,7 @@ class SignInViewModel : ViewModel() {
                             // 좋아요를 누른 사용자에 대한 댓글을 가져옴
                             val comment = Comment(
                                 content = document.getString("content") ?: "",
-                                createdAt = document.getTimestamp("createdAt") ?: Timestamp.now(),
+                                createdAt = document.getTimestamp("createdAt")!!,
                                 movieId = document.getString("movieId") ?: "",
                                 score = document.getLong("score") ?: 0,
                                 userId = document.getString("userId") ?: ""

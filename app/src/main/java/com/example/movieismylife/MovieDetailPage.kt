@@ -1,5 +1,6 @@
 package com.example.movieismylife
 
+import android.util.Log
 import android.widget.Space
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
@@ -74,6 +75,8 @@ import com.example.movieismylife.viewmodel.MovieListViewModel
 import com.example.movieismylife.viewmodel.MovieReviewViewModel
 import com.example.movieismylife.viewmodel.ReplyViewModel
 import com.example.movieismylife.viewmodel.ReviewViewModel
+import com.example.movieismylife.viewmodel.SignInState
+import com.example.movieismylife.viewmodel.SignInViewModel
 import kotlinx.coroutines.delay
 
 @OptIn(ExperimentalMaterial3Api::class)
@@ -84,6 +87,7 @@ fun MovieDetailPage(
     movieReviewViewModel: MovieReviewViewModel,
     reviewViewModel: ReviewViewModel,
     replyViewModel: ReplyViewModel,
+    signInViewModel: SignInViewModel,
     onClickBackArrow: () -> Unit,
 ) {
     // Sample data
@@ -91,6 +95,10 @@ fun MovieDetailPage(
     val poster_path = "https://media.themoviedb.org/t/p/w220_and_h330_face/"
     val year = movieDetail?.releaseDate?.substring(0, 4)
     var isMovieDetail by rememberSaveable{ mutableStateOf(true) }
+    val uiState by signInViewModel.state.collectAsState()
+    val getUserId = (uiState as? SignInState.Success)?.user?.id ?: -1
+    val userId = getUserId.toString()
+    val averageScore by reviewViewModel.averageScore.collectAsState()
 
     Scaffold(
         modifier = Modifier.fillMaxSize(),
@@ -203,6 +211,33 @@ fun MovieDetailPage(
                                     Text(
                                         text = String.format(
                                             "%.1f",
+                                            averageScore
+                                        ),
+                                        color = Color.White
+                                    )
+                                    Spacer(
+                                        modifier = Modifier
+                                            .width(10.dp)
+                                    )
+                                    Text(
+                                        text = "TMDB",
+                                        color = Color.Yellow
+                                    )
+                                    Icon(
+                                        imageVector = Icons.Default.Star,
+                                        contentDescription = null,
+                                        tint = Color.White,
+                                        modifier = Modifier
+                                            .size(20.dp)
+                                            .padding(top = 3.dp)
+                                    )
+                                    Spacer(
+                                        modifier = Modifier
+                                            .width(3.dp)
+                                    )
+                                    Text(
+                                        text = String.format(
+                                            "%.1f",
                                             movieDetail?.voteAverage ?: 0.0
                                         ),
                                         color = Color.White
@@ -229,31 +264,19 @@ fun MovieDetailPage(
                     }
                     Spacer(
                         modifier = Modifier
-                            .width(80.dp)
+                            .width(140.dp)
                     )
                     Box(
                         modifier = Modifier.clickable(onClick =
                             {
                                 if(isMovieDetail) isMovieDetail = !isMovieDetail
-                                reviewViewModel.loadComments(movieDetail?.id.toString(), userId = "2") // user: 로그인돼있는 유저
+                                reviewViewModel.loadComments(movieDetail?.id.toString(), userId = userId) // user: 로그인돼있는 유저
+                                Log.d("check^^", "checking&")
                             }
                         )
                     ) {
                         Text(
                             text = "리뷰",
-                            color = Color.White, // Set the text color
-                            fontSize = 18.sp // Set the text size
-                        )
-                    }
-                    Spacer(
-                        modifier = Modifier
-                            .width(80.dp)
-                    )
-                    Box(
-                        modifier = Modifier.clickable(onClick = { navController.navigate("theaterPage") })
-                    ) {
-                        Text(
-                            text = "상영정보",
                             color = Color.White, // Set the text color
                             fontSize = 18.sp // Set the text size
                         )
@@ -265,7 +288,8 @@ fun MovieDetailPage(
                     movieReviewViewModel,
                     reviewViewModel,
                     movieDetailViewModel,
-                    replyViewModel
+                    replyViewModel,
+                    signInViewModel
                 )
             }
         }
@@ -388,10 +412,14 @@ fun Review(
     movieReviewViewModel: MovieReviewViewModel,
     reviewViewModel: ReviewViewModel,
     movieDetailViewModel: MovieDetailViewModel,
-    replyViewModel: ReplyViewModel
+    replyViewModel: ReplyViewModel,
+    signInViewModel: SignInViewModel
     ) {
     val comments by reviewViewModel.comments.collectAsState(initial = emptyList())
     val isLoading by reviewViewModel.isLoading.collectAsState()
+    val movieDetail by movieDetailViewModel._movieDetail
+    // 별 5개 표시
+    var rating by remember { mutableStateOf(0) } // 별 점수를 관리
 
 //    val isLoading = remember { mutableStateOf(true) }
 //
@@ -403,7 +431,12 @@ fun Review(
 
     if (isLoading) {
         // 데이터가 로드되는 동안 CircularProgressIndicator 표시
-        CircularProgressIndicator()
+        Box(
+            modifier = Modifier.fillMaxSize(),
+            contentAlignment = Alignment.Center // 중앙 정렬
+        ) {
+            CircularProgressIndicator()
+        }
     } else {
         // 데이터가 로드된 후 Comment 리스트를 표시
         movieReviewViewModel.setSortOption(SortOption.LATEST)
@@ -428,7 +461,8 @@ fun Review(
                         // "리뷰 작성" 아웃라인 버튼
                         OutlinedButton(
                             onClick = {
-                                navController.navigate("reviewWrite")
+                                navController.navigate("reviewWrite/${movieDetail!!.id}")
+                                reviewViewModel.updateMovieData(movieTitle = movieDetail!!.title, moviePoster = movieDetail?.posterPath!!,score = rating)
                             },
                             modifier = Modifier
                                 .fillMaxWidth()
@@ -436,10 +470,6 @@ fun Review(
                         ) {
                             Text("리뷰 작성")
                         }
-
-                        // 별 5개 표시
-                        var rating by remember { mutableStateOf(0) } // 별 점수를 관리
-
                         Row(
                             horizontalArrangement = Arrangement.Center,
                             modifier = Modifier.fillMaxWidth()
@@ -461,7 +491,7 @@ fun Review(
                 }
             }
             items(comments) { comment ->
-                MovieDetailReviews(comment, navController, reviewViewModel, replyViewModel, movieDetailViewModel)
+                MovieDetailReviews(comment, navController, reviewViewModel, replyViewModel, movieDetailViewModel, signInViewModel)
             }
         }
     }

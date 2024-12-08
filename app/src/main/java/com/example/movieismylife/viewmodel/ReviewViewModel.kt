@@ -8,6 +8,7 @@ import com.example.movieismylife.model.Comment
 import com.example.movieismylife.model.CommentView
 import com.google.firebase.Timestamp
 import com.google.firebase.firestore.FirebaseFirestore
+import com.google.firebase.firestore.Query
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
@@ -25,6 +26,9 @@ class ReviewViewModel : ViewModel() {
 
     var _userLike: Boolean = true
     var _likeCount: Int = 0
+    var _movieTitle: String = ""
+    var _moviePoster: String = ""
+    var _score: Int = 0
 
     // 상태 관리
     private val _sharedData = MutableStateFlow<CommentView?>(null)
@@ -49,6 +53,9 @@ class ReviewViewModel : ViewModel() {
     private val _reviewType = MutableStateFlow("")
     val reviewType = _reviewType.asStateFlow()
 
+    private val _averageScore = MutableStateFlow(0.0)
+    val averageScore = _averageScore.asStateFlow()
+
     // 상태 업데이트
     fun updateData(commentData: CommentView, userLike: Boolean, likeCount: Int) {
         _sharedData.value = commentData
@@ -56,7 +63,14 @@ class ReviewViewModel : ViewModel() {
         _likeCount = likeCount
     }
 
-    fun createReview(userId:String, movieId:String, content:String, score:Long) {
+    // 상태 업데이트
+    fun updateMovieData(movieTitle: String, moviePoster: String, score: Int) {
+        _movieTitle = movieTitle
+        _moviePoster = moviePoster
+        _score = score
+    }
+
+    fun createReview(userId:String, movieId:String, content:String, score:Int) {
         // Firestore 인스턴스 가져오기
         val db = FirebaseFirestore.getInstance()
 
@@ -64,17 +78,17 @@ class ReviewViewModel : ViewModel() {
         val comment = Comment(
             userId = userId,
             movieId = movieId,
-            score = score,
+            score = score.toLong(),
             content = content,
-            createdAt = Timestamp(System.currentTimeMillis(), 0)
+            createdAt = Timestamp.now(),
+            movieTitle = _movieTitle,
+            moviePoster = _moviePoster
         )
 
 //        // 'movies' 컬렉션에서 'movie_id' 문서 내 'comments' 서브컬렉션에 댓글 추가
 //        val movieId = movieId  // 특정 영화의 ID (예: Inception, Titanic 등)
 
-        db.collection("movies")  // 'movies' 컬렉션
-            .document(movieId)  // 특정 영화 문서 ID (예: 'movie_id_1')
-            .collection("comments")  // 'comments' 서브컬렉션
+        db.collection("comments")  // 'movies' 컬렉션
             .add(comment)  // 댓글 추가
             .addOnSuccessListener { documentReference ->
                 // 댓글이 성공적으로 추가되었을 때 처리
@@ -88,6 +102,7 @@ class ReviewViewModel : ViewModel() {
 
     // 댓글을 비동기적으로 불러오는 함수
     fun loadComments(movieId: String, userId: String) { // userId: 로그인돼있는 유저
+        Log.d("movieId", movieId)
         viewModelScope.launch {
             _isLoading.value = true
             _comments.value = emptyList()
@@ -106,13 +121,12 @@ class ReviewViewModel : ViewModel() {
                 for (document in querySnapshot) {
                     val documentId = document.id
                     val comment = document.toObject(Comment::class.java)
-
+                    Log.d("check^^", comment.content)
                     // Firestore에서 사용자 정보 가져오기
                     val (name, profile) = fetchName(comment.userId)
 
                     // Firestore에서 좋아요 정보 가져오기
                     val userLike = fetchUserLike(userId, documentId) // userId: 로그인돼있는 유저
-                    Log.d("wtf", "${userLike}")
 
                     // 좋아요 개수 카운트
                     var likeCount = 0
@@ -149,6 +163,7 @@ class ReviewViewModel : ViewModel() {
                 }
                 _isLoading.value = false
             } catch (e: Exception) {
+                Log.e("FirestoreError", "Error fetching data: ${e.message}")
                 e.printStackTrace()
             }
         }
@@ -437,6 +452,36 @@ class ReviewViewModel : ViewModel() {
             Log.e("FirestoreError", "Error fetching document: ${e.message}") // 에러 메시지를 로그로 출력
             e.printStackTrace()
             listOf(0f, "", 0)
+        }
+    }
+
+    fun calculateAverageScore(movieId: String) {
+        val commentScoreList = mutableListOf<Long>()
+        viewModelScope.launch {
+            val db = FirebaseFirestore.getInstance()
+
+            try {
+                // Firestore에서 댓글 가져오기
+                val querySnapshot = db.collection("comments")
+                    .whereEqualTo("movieId", movieId)
+                    .get()
+                    .await()
+                for (document in querySnapshot) {
+                    val comment = document.toObject(Comment::class.java)
+                    Log.d("@@@@@", "${comment.score}")
+                    // score만 가져와서 scoreList에 추가
+                    commentScoreList.add(comment.score ?: 0L)  // score가 null일 경우 0L을 기본값으로 추가
+                }
+                // 유효한 score가 있다면 평균 계산, 없으면 0.0 반환
+                if (commentScoreList.isNotEmpty()) {
+                    _averageScore.value = commentScoreList.average() // 평균 계산
+                } else {
+                    _averageScore.value = 0.0 // 유효한 score가 없을 경우 0.0 반환
+                }
+                Log.d("@@@@@", "${_averageScore.value}")
+            } catch (e: Exception) {
+                e.printStackTrace()
+            }
         }
     }
 }
