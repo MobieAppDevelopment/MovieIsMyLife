@@ -28,8 +28,7 @@ import com.example.movieismylife.viewmodel.UserViewModel
 @Composable
 fun SignInPage(
     navController: NavController,
-    signInViewModel: SignInViewModel,
-//    userViewModel: UserViewModel
+    signInViewModel: SignInViewModel
 ){
     val uiState = signInViewModel.state.collectAsState()
 

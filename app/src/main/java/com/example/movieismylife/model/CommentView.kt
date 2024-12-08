@@ -9,7 +9,7 @@ data class CommentView (
     val profile: String = "",
     val title: String = "",
     val posterImage: String = "",
-    val createdAt: Timestamp,
+    val createdAt: Timestamp = Timestamp.now(),
     val commentId: String = "",
     val movieId: String = "",
     val userLike: Boolean = false,

@@ -6,6 +6,7 @@ import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.example.movieismylife.model.Comment
+import com.google.firebase.Timestamp
 import com.google.firebase.firestore.FirebaseFirestore
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
@@ -47,9 +48,9 @@ class SignInViewModel : ViewModel() {
                         password = document.getString("password") ?: "",
                         profile = document.getString("profile") ?: ""
                     )
-                    Log.d("id is ", document.id)
                     getLikeComments(document.id)
                     getMyComments(document.id)
+
                     _state.value = SignInState.Success(user)
                 } else {
                     _state.value = SignInState.Error("Invalid username or password")
@@ -94,6 +95,7 @@ class SignInViewModel : ViewModel() {
                 }
 
             } catch (e: Exception) {
+                Log.d("tset", "너냐?")
                 _state.value = SignInState.Error(e.message ?: "Unknown error occurred")
             }
         }
@@ -102,28 +104,56 @@ class SignInViewModel : ViewModel() {
     private fun getMyComments(id: String) {
         viewModelScope.launch {
             try {
+                Log.d("tset", "1")
                 val querySnapshot = firestore.collection("comments")
                     .whereEqualTo("userId", id)
                     .get()
                     .await()
+                Log.d("tset", "2")
 
                 if (!querySnapshot.isEmpty) {
                     val commentList = querySnapshot.documents.mapNotNull { document ->
-                        val comment = Comment(
-                            content = document.getString("content") ?: "",
-                            createdAt = document.getTimestamp("createdAt")!!,
-                            movieId = document.getString("movieId") ?: "",
-                            score = document.getLong("score")!!.toFloat() ?: 0f,
-                            userId = document.getString("userId") ?: ""
-                        )
-                        comment
+                        if(querySnapshot.isEmpty) {
+                            null
+                        } else {
+                            Comment(
+                                content = document.getString("content") ?: "",
+                                createdAt = document.getTimestamp("createdAt") ?: Timestamp.now(),
+                                movieId = document.getString("movieId") ?: "",
+                                score = document.getLong("score")!!.toFloat() ?: 0f,
+                                userId = document.getString("userId") ?: ""
+                            )
+                        }
                     }.filterNotNull()
+                    Log.d("tset", "3")
+                    Log.d("tset", "4")
                     _myComments.value = commentList
+                    Log.d("tset", "5")
                 }
 
             } catch (e: Exception) {
+                Log.d("tset", "너야?")
+                Log.d("error is ", e.message!!)
                 _state.value = SignInState.Error(e.message ?: "Unknown error occurred")
             }
+        }
+    }
+
+    fun logout() {
+        viewModelScope.launch {
+            // Reset the sign-in state
+            _state.value = SignInState.Nothing
+
+            // Clear liked comments
+            _likeComments.value = emptyList()
+
+            // Clear user's comments
+            _myComments.value = emptyList()
+
+            // You might want to perform additional cleanup here if needed
+            // For example, clearing any cached data or resetting other variables
+
+            Log.d("SignInViewModel", "User logged out and all states reset")
         }
     }
 }

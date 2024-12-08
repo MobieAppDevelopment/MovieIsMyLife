@@ -77,7 +77,6 @@ class MainActivity : ComponentActivity() {
                 val replyViewModel = viewModel<ReplyViewModel>()
                 val signUpViewModel = viewModel<SignUpViewModel>()
                 val signInViewModel = viewModel<SignInViewModel>()
-                val myPageViewModel = viewModel<MyPageViewModel>()
 
                 val mapViewModel: MapViewModel = viewModel(
                     factory = viewModelFactory {
