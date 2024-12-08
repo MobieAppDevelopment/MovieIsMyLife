@@ -29,6 +29,8 @@ import com.example.movieismylife.viewmodel.SignInViewModel
 fun MyPage(
     navController: NavController,
     signInViewModel: SignInViewModel,
+    myPageViewModel: MyPageViewModel,
+    reviewViewModel: ReviewViewModel
     ) {
     val uiState by signInViewModel.state.collectAsState()
 
@@ -70,12 +72,18 @@ fun MyPage(
                     } else {
                         signInViewModel.myComments.value?.size.toString()
                     },
-                    onClick = { }
+                    onClick = {
+                        navController.navigate("writtenReviews/${"2"}")
+                        reviewViewModel.loadMyComments(userId = "2")
+                    }
                 )
                 ReviewSection(
                     title = "좋아요한 리뷰",
                     count = signInViewModel.likeComments.value?.size.toString(),
-                    onClick = { }
+                    onClick = {
+                        navController.navigate("likedReviews/${"2"}")
+                        reviewViewModel.loadMyLikeComments(userId = "2")
+                    }
                 )
 
                 // Logout Button

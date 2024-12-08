@@ -196,9 +196,46 @@ class MainActivity : ComponentActivity() {
                     ) {
                         MyPage(
                             navController = navController,
-                            signInViewModel = signInViewModel
+                            myPageViewModel = MyPageViewModel(),
+                            signInViewModel = signInViewModel,
+                            reviewViewModel = reviewViewModel
                         )
                     }
+                    composable(route = "writtenReviews/{userId}", arguments = listOf(
+                        navArgument("userId") {
+                            type = NavType.StringType
+                        }),
+                        enterTransition = { slideInHorizontally() },
+                        exitTransition = { slideOutHorizontally() }
+                    ) {
+                        val userId = it.arguments?.getString("userId") ?: ""
+                        MovieReviewManagementPage(
+                            navController = navController,
+                            userId = userId,
+                            reviewViewModel = reviewViewModel,
+                            onClickBackArrow = {
+                                navController.popBackStack()
+                            }
+                        )
+                    }
+
+                    composable(route = "likedReviews/{userId}", arguments = listOf(
+                        navArgument("userId") {
+                            type = NavType.StringType
+                        }),
+                        enterTransition = { slideInHorizontally() },
+                        exitTransition = { slideOutHorizontally() }
+                    ) {
+                        val userId = it.arguments?.getString("userId") ?: ""
+                        MovieLikeReviewManagementPage(
+                            navController = navController,
+                            userId = userId,
+                            reviewViewModel = reviewViewModel,
+                            onClickBackArrow = {
+                                navController.popBackStack()
+                            })
+                    }
+
                     composable(route = "reviewWrite") {
                         ReviewWritePage(navController = navController)
                     }
