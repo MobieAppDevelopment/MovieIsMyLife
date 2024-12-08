@@ -6,13 +6,9 @@ import com.google.firebase.Timestamp
 data class Comment(
     val userId: String = "",
     val movieId: String = "",
-    val score: Float = 0f,
+    val score: Long = 0,
     val content: String = "",
-//    val name: String = "",
-//    val profile: String = "",
-//    val title: String = "",
-//    val posterImage: String = "",
-    val createdAt: Timestamp,
+    val createdAt: Timestamp = Timestamp.now(),
     val movieTitle: String = "",
     val moviePoster: String = "",
 )

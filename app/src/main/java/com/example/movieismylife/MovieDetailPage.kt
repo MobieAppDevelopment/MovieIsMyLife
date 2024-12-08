@@ -40,6 +40,7 @@ import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
 import androidx.compose.material3.MaterialTheme
+import androidx.compose.material3.OutlinedButton
 import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Surface
 import androidx.compose.material3.Text
@@ -414,6 +415,51 @@ fun Review(
                 .padding(bottom = 4.dp),
             verticalArrangement = Arrangement.spacedBy(4.dp)
         ) {
+            item {
+                Box(
+                    modifier = Modifier
+                        .fillMaxWidth()
+                        .padding(16.dp)
+                ) {
+                    Column(
+                        horizontalAlignment = Alignment.CenterHorizontally,
+                        verticalArrangement = Arrangement.Center
+                    ) {
+                        // "리뷰 작성" 아웃라인 버튼
+                        OutlinedButton(
+                            onClick = {
+                                navController.navigate("reviewWrite")
+                            },
+                            modifier = Modifier
+                                .fillMaxWidth()
+                                .padding(bottom = 16.dp)
+                        ) {
+                            Text("리뷰 작성")
+                        }
+
+                        // 별 5개 표시
+                        var rating by remember { mutableStateOf(0) } // 별 점수를 관리
+
+                        Row(
+                            horizontalArrangement = Arrangement.Center,
+                            modifier = Modifier.fillMaxWidth()
+                        ) {
+                            for (i in 1..5) {
+                                Icon(
+                                    imageVector = if (i <= rating) Icons.Default.Star else Icons.Default.Star,
+                                    contentDescription = "Star $i",
+                                    modifier = Modifier
+                                        .size(40.dp)
+                                        .clickable {
+                                            rating = i // 클릭한 별 번호로 점수 업데이트
+                                        },
+                                    tint = if (i <= rating) Color.Yellow else Color.Gray // 별 색을 노란색으로 변경
+                                )
+                            }
+                        }
+                    }
+                }
+            }
             items(comments) { comment ->
                 MovieDetailReviews(comment, navController, reviewViewModel, replyViewModel, movieDetailViewModel)
             }

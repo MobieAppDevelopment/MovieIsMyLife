@@ -112,29 +112,29 @@ fun ReviewWritePage(navController: NavController) {
                         .wrapContentWidth()
                 )
 
-                // Private Toggle
-                Row(
-                    modifier = Modifier
-                        .fillMaxWidth()
-                        .padding(top = 16.dp),
-                    horizontalArrangement = Arrangement.SpaceBetween
-                ) {
-                    Text(
-                        text = "비공개",
-                        color = Color.White,
-                        fontSize = 16.sp
-                    )
-                    Switch(
-                        checked = isPrivate,
-                        onCheckedChange = { isPrivate = it },
-                        colors = SwitchDefaults.colors(
-                            checkedThumbColor = Color(0xFF4B6BFB),
-                            checkedTrackColor = Color(0xFF4B6BFB).copy(alpha = 0.5f),
-                            uncheckedThumbColor = Color.Gray,
-                            uncheckedTrackColor = Color.Gray.copy(alpha = 0.5f)
-                        )
-                    )
-                }
+//                // Private Toggle
+//                Row(
+//                    modifier = Modifier
+//                        .fillMaxWidth()
+//                        .padding(top = 16.dp),
+//                    horizontalArrangement = Arrangement.SpaceBetween
+//                ) {
+//                    Text(
+//                        text = "비공개",
+//                        color = Color.White,
+//                        fontSize = 16.sp
+//                    )
+//                    Switch(
+//                        checked = isPrivate,
+//                        onCheckedChange = { isPrivate = it },
+//                        colors = SwitchDefaults.colors(
+//                            checkedThumbColor = Color(0xFF4B6BFB),
+//                            checkedTrackColor = Color(0xFF4B6BFB).copy(alpha = 0.5f),
+//                            uncheckedThumbColor = Color.Gray,
+//                            uncheckedTrackColor = Color.Gray.copy(alpha = 0.5f)
+//                        )
+//                    )
+//                }
             }
         }
     }

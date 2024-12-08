@@ -1,9 +1,12 @@
 package com.example.movieismylife
 
+import android.util.Log
 import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.shape.CircleShape
+import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.filled.ArrowBack
 import androidx.compose.material3.*
 import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
@@ -14,7 +17,10 @@ import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.navigation.NavController
+import com.example.movieismylife.viewmodel.MovieDetailViewModel
+import com.example.movieismylife.viewmodel.MovieReviewViewModel
 import com.example.movieismylife.viewmodel.MyPageViewModel
+import com.example.movieismylife.viewmodel.ReplyViewModel
 import com.example.movieismylife.viewmodel.ReviewViewModel
 import com.example.movieismylife.viewmodel.SignInState
 import com.example.movieismylife.viewmodel.SignInViewModel
@@ -22,11 +28,11 @@ import com.example.movieismylife.viewmodel.SignInViewModel
 @Composable
 fun MyPage(
     navController: NavController,
-    myPageViewModel: MyPageViewModel,
     signInViewModel: SignInViewModel,
+    myPageViewModel: MyPageViewModel,
     reviewViewModel: ReviewViewModel
     ) {
-    val uiState = signInViewModel.state.collectAsState()
+    val uiState by signInViewModel.state.collectAsState()
 
     Scaffold(
         modifier = Modifier.fillMaxSize(),
@@ -42,7 +48,18 @@ fun MyPage(
                     .padding(16.dp)
             ) {
                 // Profile Section (Same as before)
-                ProfileSection()
+                when (val state = uiState) {
+                    is SignInState.Success -> {
+                        val user = state.user
+                        Log.d("test", user.name)
+                        Log.d("test", user.id)
+                        ProfileSection(user.name, user.id)
+                    }
+
+                    is SignInState.Error -> {}
+                    is SignInState.Loading -> {}
+                    is SignInState.Nothing -> {Log.d("now", "nothing")}
+                }
 
                 // Stats Section (Same as before)
                 StatsSection()
@@ -50,7 +67,11 @@ fun MyPage(
                 // Review Sections (Now with click handlers)
                 ReviewSection(
                     title = "작성한 리뷰",
-                    count = "0",
+                    count = if(signInViewModel.myComments.value == null) {
+                        "0"
+                    } else {
+                        signInViewModel.myComments.value?.size.toString()
+                    },
                     onClick = {
                         navController.navigate("writtenReviews/${"2"}")
                         reviewViewModel.loadMyComments(userId = "2")
@@ -58,19 +79,36 @@ fun MyPage(
                 )
                 ReviewSection(
                     title = "좋아요한 리뷰",
-                    count = "0",
+                    count = signInViewModel.likeComments.value?.size.toString(),
                     onClick = {
                         navController.navigate("likedReviews/${"2"}")
                         reviewViewModel.loadMyLikeComments(userId = "2")
                     }
                 )
+
+                // Logout Button
+                Spacer(modifier = Modifier.weight(1f))
+                Button(
+                    onClick = {
+                        navController.navigate("signin") {
+                            navController.popBackStack()
+                        }
+                        signInViewModel.logout()
+                    },
+                    modifier = Modifier
+                        .fillMaxWidth()
+                        .padding(vertical = 16.dp),
+                    colors = ButtonDefaults.buttonColors(containerColor = Color(0xFFE50914))
+                ) {
+                    Text("로그아웃", color = Color.White)
+                }
             }
         }
     }
 }
 
 @Composable
-fun ProfileSection() {
+fun ProfileSection(name: String, id: String) {
     Column(
         horizontalAlignment = Alignment.CenterHorizontally,
         modifier = Modifier.fillMaxWidth()
@@ -82,7 +120,7 @@ fun ProfileSection() {
                 .background(Color(0xFF3B4155))
         ) {
             Text(
-                text = "강",
+                text = name.substring(0 until 1),
                 color = Color.White,
                 fontSize = 32.sp,
                 modifier = Modifier.align(Alignment.Center)
@@ -90,7 +128,7 @@ fun ProfileSection() {
         }
 
         Text(
-            text = "강인한_크리스토퍼_626559",
+            text = name,
             color = Color.White,
             fontSize = 20.sp,
             fontWeight = FontWeight.Bold,
@@ -98,7 +136,7 @@ fun ProfileSection() {
         )
 
         Text(
-            text = "ID 398165",
+            text = "ID ${id}",
             color = Color.Gray,
             fontSize = 14.sp,
             modifier = Modifier.padding(top = 4.dp)

@@ -56,7 +56,7 @@ class ReviewViewModel : ViewModel() {
         _likeCount = likeCount
     }
 
-    fun createReview(userId:String, movieId:String, content:String, score:Float) {
+    fun createReview(userId:String, movieId:String, content:String, score:Long) {
         // Firestore 인스턴스 가져오기
         val db = FirebaseFirestore.getInstance()
 
@@ -396,7 +396,7 @@ class ReviewViewModel : ViewModel() {
 
                     // CommentView 생성
                     val myLikeCommentView = CommentView(
-                        score = commentFieldList[0] as? Float ?: 0f,
+                        score = commentFieldList[0] as? Long ?: 0,
                         content = commentFieldList[1] as? String ?: "",
                         title = myLikeComment["movieTitle"] as String,
                         posterImage = myLikeComment["moviePoster"] as String,
@@ -423,7 +423,7 @@ class ReviewViewModel : ViewModel() {
             val document = db.collection("comments").document(commentId).get().await()
 
             if (document.exists()) {
-                val score = document.getDouble("score")?.toFloat() ?: 0f
+                val score = document.getLong("score") ?: 0
                 val content = document.getString("content") ?: ""
                 val createdAt = document.getTimestamp("createdAt") ?: 0 // Timestamp를 Date로 변환 // toDate()해야되나?
                 Log.d("check!!@@##", "${score}")
