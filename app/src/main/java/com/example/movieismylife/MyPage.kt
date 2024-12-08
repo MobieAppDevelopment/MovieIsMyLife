@@ -24,6 +24,8 @@ fun MyPage(
     myPageViewModel: MyPageViewModel,
     signInViewModel: SignInViewModel
     ) {
+    val uiState = signInViewModel.state.collectAsState()
+
     Scaffold(
         modifier = Modifier.fillMaxSize(),
         bottomBar = { MovieBottomBar(navController=navController) }
