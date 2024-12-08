@@ -32,7 +32,7 @@ import com.example.movieismylife.viewmodel.MyPageViewModel
 import com.example.movieismylife.viewmodel.ReviewViewModel
 import com.example.movieismylife.viewmodel.SignInViewModel
 import com.example.movieismylife.viewmodel.SignUpViewModel
-//import com.example.movieismylife.viewmodel.UserViewModel
+import com.example.movieismylife.viewmodel.UserViewModel
 import com.google.android.libraries.places.api.Places
 import com.google.android.libraries.places.api.net.PlacesClient
 import kotlin.math.sign
@@ -196,8 +196,43 @@ class MainActivity : ComponentActivity() {
                     ) {
                         MyPage(
                             navController = navController,
-                            signInViewModel = signInViewModel
+                            myPageViewModel = MyPageViewModel(),
+                            signInViewModel = SignInViewModel(),
+                            reviewViewModel = reviewViewModel
                         )
+                    }
+                    composable(route = "writtenReviews/{userId}", arguments = listOf(
+                        navArgument("userId") {
+                            type = NavType.StringType
+                        }),
+                        enterTransition = { slideInHorizontally() },
+                        exitTransition = { slideOutHorizontally() }
+                    ) {
+                        val userId = it.arguments?.getString("userId") ?: ""
+                        MovieReviewManagementPage(
+                            navController = navController,
+                            userId = userId,
+                            reviewViewModel = reviewViewModel,
+                            onClickBackArrow = {
+                                navController.popBackStack()
+                            }
+                        )
+                    }
+                    composable(route = "likedReviews/{userId}", arguments = listOf(
+                        navArgument("userId") {
+                            type = NavType.StringType
+                        }),
+                        enterTransition = { slideInHorizontally() },
+                        exitTransition = { slideOutHorizontally() }
+                    ) {
+                        val userId = it.arguments?.getString("userId") ?: ""
+                        MovieLikeReviewManagementPage(
+                            navController = navController,
+                            userId = userId,
+                            reviewViewModel = reviewViewModel,
+                            onClickBackArrow = {
+                            navController.popBackStack()
+                        })
                     }
                     composable(route = "reviewWrite") {
                         ReviewWritePage(navController = navController)

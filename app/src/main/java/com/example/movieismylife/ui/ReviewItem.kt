@@ -1,5 +1,6 @@
 package com.example.movieismylife.ui
 
+import androidx.compose.foundation.Image
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
@@ -25,10 +26,14 @@ import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.dp
 import coil.compose.AsyncImage
+import coil.compose.rememberAsyncImagePainter
+import com.example.movieismylife.model.CommentView
 import com.example.movieismylife.model.MovieReview
 
 @Composable
-fun ReviewItem(review: MovieReview) {
+fun ReviewItem(myComment: CommentView) {
+    val poster_path = "https://media.themoviedb.org/t/p/w220_and_h330_face/"
+
     Card(
         modifier = Modifier
             .fillMaxWidth()
@@ -40,9 +45,11 @@ fun ReviewItem(review: MovieReview) {
                 .fillMaxWidth()
                 .padding(16.dp)
         ) {
-            AsyncImage(
-                model = review.movieImageUrl,
-                contentDescription = "${review.movieTitle} poster",
+            Image(
+                painter = rememberAsyncImagePainter(
+                    model = poster_path + myComment.posterImage
+                ),
+                contentDescription = "Loaded image",
                 modifier = Modifier
                     .width(80.dp)
                     .height(120.dp)
@@ -60,18 +67,18 @@ fun ReviewItem(review: MovieReview) {
                     verticalAlignment = Alignment.CenterVertically
                 ) {
                     Text(
-                        text = review.movieTitle,
+                        text = myComment.title,
                         style = MaterialTheme.typography.titleMedium,
                         fontWeight = FontWeight.Bold,
                         color = Color.White,
                         modifier = Modifier.weight(1f)
                     )
-                    RatingBar(rating = review.starRating)
+                    RatingBar(rating = myComment.score)
                 }
 
                 Spacer(modifier = Modifier.height(4.dp))
                 Text(
-                    text = review.reviewText,
+                    text = myComment.content,
                     style = MaterialTheme.typography.bodyMedium,
                     color = Color.White,
                     maxLines = 3,
@@ -83,7 +90,7 @@ fun ReviewItem(review: MovieReview) {
 }
 
 @Composable
-fun RatingBar(rating: Int, maxRating: Int = 5) {
+fun RatingBar(rating: Float, maxRating: Int = 5) {
     Row {
         repeat(maxRating) { index ->
             Icon(

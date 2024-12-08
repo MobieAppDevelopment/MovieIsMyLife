@@ -20,15 +20,17 @@ import androidx.navigation.NavController
 import com.example.movieismylife.viewmodel.MovieDetailViewModel
 import com.example.movieismylife.viewmodel.MovieReviewViewModel
 import com.example.movieismylife.viewmodel.MyPageViewModel
-import com.example.movieismylife.viewmodel.ReplyViewModel
 import com.example.movieismylife.viewmodel.ReviewViewModel
+import com.example.movieismylife.viewmodel.ReplyViewModel
 import com.example.movieismylife.viewmodel.SignInState
 import com.example.movieismylife.viewmodel.SignInViewModel
 
 @Composable
 fun MyPage(
     navController: NavController,
+    myPageViewModel: MyPageViewModel,
     signInViewModel: SignInViewModel,
+    reviewViewModel: ReviewViewModel
     ) {
     val uiState by signInViewModel.state.collectAsState()
 
@@ -51,7 +53,7 @@ fun MyPage(
                         val user = state.user
                         Log.d("test", user.name)
                         Log.d("test", user.id)
-                        ProfileSection(user.name, user.id)
+                        ProfileSection() // user.name, user.id
                     }
 
                     is SignInState.Error -> {}
@@ -70,12 +72,18 @@ fun MyPage(
                     } else {
                         signInViewModel.myComments.value?.size.toString()
                     },
-                    onClick = { }
+                    onClick = {
+                        navController.navigate("writtenReviews/${"2"}")
+                        reviewViewModel.loadMyComments(userId = "2")
+                    }
                 )
                 ReviewSection(
                     title = "좋아요한 리뷰",
                     count = signInViewModel.likeComments.value?.size.toString(),
-                    onClick = { }
+                    onClick = {
+                        navController.navigate("likedReviews/${"2"}")
+                        reviewViewModel.loadMyLikeComments(userId = "2")
+                    }
                 )
 
                 // Logout Button
@@ -100,7 +108,7 @@ fun MyPage(
 }
 
 @Composable
-fun ProfileSection(name: String, id: String) {
+fun ProfileSection() {
     Column(
         horizontalAlignment = Alignment.CenterHorizontally,
         modifier = Modifier.fillMaxWidth()
@@ -112,7 +120,7 @@ fun ProfileSection(name: String, id: String) {
                 .background(Color(0xFF3B4155))
         ) {
             Text(
-                text = name.substring(0 until 1),
+                text = "강",
                 color = Color.White,
                 fontSize = 32.sp,
                 modifier = Modifier.align(Alignment.Center)
@@ -120,7 +128,7 @@ fun ProfileSection(name: String, id: String) {
         }
 
         Text(
-            text = name,
+            text = "강인한_크리스토퍼_626559",
             color = Color.White,
             fontSize = 20.sp,
             fontWeight = FontWeight.Bold,
@@ -128,7 +136,7 @@ fun ProfileSection(name: String, id: String) {
         )
 
         Text(
-            text = "ID ${id}",
+            text = "ID 398165",
             color = Color.Gray,
             fontSize = 14.sp,
             modifier = Modifier.padding(top = 4.dp)

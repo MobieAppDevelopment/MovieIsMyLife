@@ -1,5 +1,6 @@
 package com.example.movieismylife
 
+import android.util.Log
 import android.widget.Space
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
@@ -236,6 +237,7 @@ fun MovieDetailPage(
                             {
                                 if(isMovieDetail) isMovieDetail = !isMovieDetail
                                 reviewViewModel.loadComments(movieDetail?.id.toString(), userId = "2") // user: 로그인돼있는 유저
+                                Log.d("check^^", "checking&")
                             }
                         )
                     ) {

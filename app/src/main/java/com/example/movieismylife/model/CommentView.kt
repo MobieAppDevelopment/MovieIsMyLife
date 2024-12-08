@@ -3,7 +3,7 @@ package com.example.movieismylife.model
 import com.google.firebase.Timestamp
 
 data class CommentView (
-    val score: Long = 0,
+    val score: Float = 0f,
     val content: String = "",
     val name: String = "",
     val profile: String = "",

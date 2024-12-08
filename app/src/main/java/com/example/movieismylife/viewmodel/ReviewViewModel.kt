@@ -3,6 +3,7 @@ package com.example.movieismylife.viewmodel
 import android.util.Log
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
+import com.example.movieismylife.enum.SortOption
 import com.example.movieismylife.model.Comment
 import com.example.movieismylife.model.CommentView
 import com.google.firebase.Timestamp
@@ -11,6 +12,7 @@ import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.asStateFlow
+import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.tasks.await
 import kotlinx.coroutines.withContext
@@ -34,6 +36,19 @@ class ReviewViewModel : ViewModel() {
     private val _isLoading = MutableStateFlow(true) // 로드 상태 관리
     val isLoading: StateFlow<Boolean> = _isLoading
 
+    private val _myComments = MutableStateFlow<List<CommentView>>(emptyList())
+    val myComments = _myComments.asStateFlow()
+
+    private val _myLikeComments = MutableStateFlow<List<CommentView>>(emptyList())
+    val myLikeComments = _myLikeComments.asStateFlow()
+
+    private val _sortOption = MutableStateFlow(SortOption.LATEST)
+    val sortOption = _sortOption.asStateFlow()
+
+    // 내가 쓴 리뷰 페이지 인가? 좋아요를 누른 걸 확인하는 리뷰 페이지 인가?
+    private val _reviewType = MutableStateFlow("")
+    val reviewType = _reviewType.asStateFlow()
+
     // 상태 업데이트
     fun updateData(commentData: CommentView, userLike: Boolean, likeCount: Int) {
         _sharedData.value = commentData
@@ -41,7 +56,7 @@ class ReviewViewModel : ViewModel() {
         _likeCount = likeCount
     }
 
-    fun createReview(userId:String, movieId:String, content:String, score:Long) {
+    fun createReview(userId:String, movieId:String, content:String, score:Float) {
         // Firestore 인스턴스 가져오기
         val db = FirebaseFirestore.getInstance()
 
@@ -51,7 +66,7 @@ class ReviewViewModel : ViewModel() {
             movieId = movieId,
             score = score,
             content = content,
-            createdAt = Timestamp.now()
+            createdAt = Timestamp(System.currentTimeMillis(), 0)
         )
 
 //        // 'movies' 컬렉션에서 'movie_id' 문서 내 'comments' 서브컬렉션에 댓글 추가
@@ -73,6 +88,7 @@ class ReviewViewModel : ViewModel() {
 
     // 댓글을 비동기적으로 불러오는 함수
     fun loadComments(movieId: String, userId: String) { // userId: 로그인돼있는 유저
+        Log.d("movieId", movieId)
         viewModelScope.launch {
             _isLoading.value = true
             _comments.value = emptyList()
@@ -91,13 +107,12 @@ class ReviewViewModel : ViewModel() {
                 for (document in querySnapshot) {
                     val documentId = document.id
                     val comment = document.toObject(Comment::class.java)
-
+                    Log.d("check^^", comment.content)
                     // Firestore에서 사용자 정보 가져오기
                     val (name, profile) = fetchName(comment.userId)
 
                     // Firestore에서 좋아요 정보 가져오기
                     val userLike = fetchUserLike(userId, documentId) // userId: 로그인돼있는 유저
-                    Log.d("wtf", "${userLike}")
 
                     // 좋아요 개수 카운트
                     var likeCount = 0
@@ -279,5 +294,149 @@ class ReviewViewModel : ViewModel() {
                         }
                 }
             }
+    }
+
+    // 댓글을 비동기적으로 불러오는 함수
+    fun loadMyComments(userId: String) { // userId: 로그인돼있는 유저
+        viewModelScope.launch {
+            _isLoading.value = true
+            _myComments.value = emptyList()
+
+            val db = FirebaseFirestore.getInstance()
+
+            try {
+                // Firestore에서 댓글 가져오기
+                val querySnapshot = db.collection("comments")
+                    .whereEqualTo("userId", userId)
+                    .get()
+                    .await()
+
+                val myCommentList = mutableListOf<CommentView>()
+
+                for (document in querySnapshot) {
+                    val comment = document.toObject(Comment::class.java)
+
+                    // CommentView 생성
+                    val myCommentView = CommentView(
+                        score = comment.score,
+                        content = comment.content,
+                        title = comment.movieTitle,
+                        posterImage = comment.moviePoster,
+                        createdAt = comment.createdAt,
+                    )
+                    myCommentList.add(myCommentView)
+                }
+
+                // UI 업데이트 (Main Thread)
+                withContext(Dispatchers.Main) {
+                    _myComments.value = myCommentList
+                }
+                _isLoading.value = false
+            } catch (e: Exception) {
+                e.printStackTrace()
+            }
+        }
+    }
+
+    //정렬 기준 설정
+    fun setSortOption(option: SortOption, reviewType: String) {
+        _sortOption.value = option
+        if(reviewType == "MY REVIEW") sortReviews(reviewType)
+        else sortReviews(reviewType)
+    }
+
+    // 정렬 수행
+    private fun sortReviews(reviewType: String) {
+        if(reviewType == "MY REVIEW") {
+            _myComments.update { reviews ->
+                when (_sortOption.value) {
+                    SortOption.LATEST -> reviews.sortedByDescending { it.createdAt } // 최신순 정렬
+                    SortOption.RATING -> reviews.sortedByDescending { it.score } // 별점순 정렬
+                }
+            }
+        }
+        else{
+            _myLikeComments.update { reviews ->
+                when (_sortOption.value) {
+                    SortOption.LATEST -> reviews.sortedByDescending { it.createdAt } // 최신순 정렬
+                    SortOption.RATING -> reviews.sortedByDescending { it.score } // 별점순 정렬
+                }
+            }
+        }
+    }
+
+    // 댓글을 비동기적으로 불러오는 함수
+    fun loadMyLikeComments(userId: String) { // userId: 로그인돼있는 유저
+        viewModelScope.launch {
+            _isLoading.value = true
+            _myComments.value = emptyList()
+
+            val db = FirebaseFirestore.getInstance()
+
+            try {
+                // Firestore에서 댓글 가져오기
+                val querySnapshot = db.collection("userLikes")
+                    .whereEqualTo("userId", userId)
+                    .get()
+                    .await()
+
+                val myLikeCommentList = mutableListOf<CommentView>()
+
+                for (document in querySnapshot) {
+                    val myLikeCommentMap = document.data
+                    val myLikeComment = mapOf(
+                        "user" to myLikeCommentMap["userId"],
+                        "commentId" to myLikeCommentMap["commentId"],
+                        "movieTitle" to myLikeCommentMap["movieTitle"],
+                        "moviePoster" to myLikeCommentMap["moviePoster"]
+                    )
+
+                    // Firestore에서 사용자 정보 가져오기
+                    val commentFieldList: List<Any?> = fetchComment(myLikeComment["commentId"] as String)
+
+                    // CommentView 생성
+                    val myLikeCommentView = CommentView(
+                        score = commentFieldList[0] as? Float ?: 0f,
+                        content = commentFieldList[1] as? String ?: "",
+                        title = myLikeComment["movieTitle"] as String,
+                        posterImage = myLikeComment["moviePoster"] as String,
+                        createdAt = commentFieldList[2] as? Timestamp ?: Timestamp(0, 0)
+                    )
+                    myLikeCommentList.add(myLikeCommentView)
+                }
+
+                // UI 업데이트 (Main Thread)
+                withContext(Dispatchers.Main) {
+                    _myLikeComments.value = myLikeCommentList
+                }
+                _isLoading.value = false
+            } catch (e: Exception) {
+                e.printStackTrace()
+            }
+        }
+    }
+
+    suspend fun fetchComment(commentId: String): List<Any?> {
+        Log.d("check!!@@##", "${commentId}")
+        return try {
+            val db = FirebaseFirestore.getInstance()
+            val document = db.collection("comments").document(commentId).get().await()
+
+            if (document.exists()) {
+                val score = document.getDouble("score")?.toFloat() ?: 0f
+                val content = document.getString("content") ?: ""
+                val createdAt = document.getTimestamp("createdAt") ?: 0 // Timestamp를 Date로 변환 // toDate()해야되나?
+                Log.d("check!!@@##", "${score}")
+                Log.d("check!!@@##", "${content}")
+                Log.d("check!!@@##", "${createdAt}")
+                listOf(score, content, createdAt)
+            } else {
+                listOf(0f, "", 0)
+            }
+        } catch (e: Exception) {
+            Log.e("FirestoreError", "Error fetching document: ${e.message}") // 에러 메시지를 로그로 출력
+            e.printStackTrace()
+            listOf(0f, "", 0)
+        }
     }
 }
