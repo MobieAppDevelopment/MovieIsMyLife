@@ -19,7 +19,7 @@
         tools:targetApi="34">
         <meta-data
                 android:name="com.google.android.geo.API_KEY"
-                android:value=""/>
+            android:value="@string/maps_api_key"/>
         <activity
             android:name=".MainActivity"
             android:exported="true"
