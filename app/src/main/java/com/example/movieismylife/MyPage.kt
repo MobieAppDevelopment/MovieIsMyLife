@@ -27,10 +27,6 @@ import com.example.movieismylife.viewmodel.SignInViewModel
 fun MyPage(
     navController: NavController,
     signInViewModel: SignInViewModel,
-    reviewViewModel: ReviewViewModel,
-    movieDetailViewModel: MovieDetailViewModel,
-    movieReviewViewModel: MovieReviewViewModel,
-    replyViewModel: ReplyViewModel
     ) {
     val uiState by signInViewModel.state.collectAsState()
 
@@ -72,25 +68,12 @@ fun MyPage(
                     } else {
                         signInViewModel.myComments.value?.size.toString()
                     },
-                    onClick = {
-                        var userId = ""
-                        when (val state = uiState) {
-                            is SignInState.Success -> {
-                                val user = state.user
-                                userId = user.id
-                            }
-                            is SignInState.Error -> {}
-                            is SignInState.Loading -> {}
-                            is SignInState.Nothing -> {Log.d("now", "nothing")}
-                        }
-                        reviewViewModel.loadMyComments(userId = userId)
-                        navController.navigate("writtenReviews")
-                    }
+                    onClick = { }
                 )
                 ReviewSection(
                     title = "좋아요한 리뷰",
                     count = signInViewModel.likeComments.value?.size.toString(),
-                    onClick = { navController.navigate("likedReviews") }
+                    onClick = { }
                 )
             }
         }

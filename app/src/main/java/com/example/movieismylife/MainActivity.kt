@@ -197,25 +197,11 @@ class MainActivity : ComponentActivity() {
                     ) {
                         MyPage(
                             navController = navController,
-                            signInViewModel = signInViewModel,
-                            reviewViewModel = reviewViewModel,
-                            movieDetailViewModel = movieDetailViewModel,
-                            movieReviewViewModel = movieReviewViewModel,
-                            replyViewModel = replyViewModel
+                            signInViewModel = signInViewModel
                         )
                     }
                     composable(route = "reviewWrite") {
                         ReviewWritePage(navController = navController)
-                    }
-                    composable(route = "writtenReviews") {
-                        WrittenReviewPage(
-                            navController = navController,
-                            signInViewModel = signInViewModel,
-                            reviewViewModel = reviewViewModel,
-                            movieDetailViewModel = movieDetailViewModel,
-                            movieReviewViewModel = movieReviewViewModel,
-                            replyViewModel = replyViewModel
-                        )
                     }
 //                    composable(route = "my",
 //                        enterTransition = { slideInHorizontally() },

@@ -428,9 +428,7 @@ fun Review(
                         // "리뷰 작성" 아웃라인 버튼
                         OutlinedButton(
                             onClick = {
-                                navController.navigate("reviewWrite") {
-                                    navController.popBackStack()
-                                }
+                                navController.navigate("reviewWrite")
                             },
                             modifier = Modifier
                                 .fillMaxWidth()
