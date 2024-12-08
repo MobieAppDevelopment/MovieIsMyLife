@@ -22,6 +22,7 @@ import androidx.navigation.NavController
 import com.example.movieismylife.viewmodel.SignInState
 import com.example.movieismylife.viewmodel.SignInViewModel
 import com.example.movieismylife.viewmodel.SignUpState
+import com.example.movieismylife.viewmodel.UserViewModel
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable

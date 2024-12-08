@@ -28,6 +28,7 @@ import com.example.movieismylife.viewmodel.MyPageViewModel
 import com.example.movieismylife.viewmodel.ReviewViewModel
 import com.example.movieismylife.viewmodel.SignInViewModel
 import com.example.movieismylife.viewmodel.SignUpViewModel
+import com.example.movieismylife.viewmodel.UserViewModel
 import com.google.android.libraries.places.api.Places
 import com.google.android.libraries.places.api.net.PlacesClient
 import kotlin.math.sign
@@ -71,6 +72,7 @@ class MainActivity : ComponentActivity() {
                 val reviewViewModel = viewModel<ReviewViewModel>()
                 val signUpViewModel = viewModel<SignUpViewModel>()
                 val signInViewModel = viewModel<SignInViewModel>()
+                val userViewModel = viewModel<UserViewModel>()
 
                 val mapViewModel: MapViewModel = viewModel(
                     factory = viewModelFactory {

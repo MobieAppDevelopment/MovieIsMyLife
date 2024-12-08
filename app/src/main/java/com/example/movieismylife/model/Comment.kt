@@ -4,6 +4,7 @@ package com.example.movieismylife.model
 data class Comment(
     val userId: String = "",
     val movieId: String = "",
+    val rating: Long = 0,
     val content: String = "",
     val createdAt: Long = 0
 )
