@@ -5,6 +5,8 @@ import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.shape.CircleShape
+import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.filled.ArrowBack
 import androidx.compose.material3.*
 import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
@@ -75,6 +77,23 @@ fun MyPage(
                     count = signInViewModel.likeComments.value?.size.toString(),
                     onClick = { }
                 )
+
+                // Logout Button
+                Spacer(modifier = Modifier.weight(1f))
+                Button(
+                    onClick = {
+                        navController.navigate("signin") {
+                            navController.popBackStack()
+                        }
+                        signInViewModel.logout()
+                    },
+                    modifier = Modifier
+                        .fillMaxWidth()
+                        .padding(vertical = 16.dp),
+                    colors = ButtonDefaults.buttonColors(containerColor = Color(0xFFE50914))
+                ) {
+                    Text("로그아웃", color = Color.White)
+                }
             }
         }
     }

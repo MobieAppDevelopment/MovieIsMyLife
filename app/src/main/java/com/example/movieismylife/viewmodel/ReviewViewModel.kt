@@ -5,6 +5,7 @@ import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.example.movieismylife.model.Comment
 import com.example.movieismylife.model.CommentView
+import com.google.firebase.Timestamp
 import com.google.firebase.firestore.FirebaseFirestore
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.flow.MutableStateFlow
@@ -50,7 +51,7 @@ class ReviewViewModel : ViewModel() {
             movieId = movieId,
             score = score,
             content = content,
-            createdAt = System.currentTimeMillis()
+            createdAt = Timestamp.now()
         )
 
 //        // 'movies' 컬렉션에서 'movie_id' 문서 내 'comments' 서브컬렉션에 댓글 추가
