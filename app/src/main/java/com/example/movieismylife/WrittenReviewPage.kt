@@ -56,7 +56,7 @@ fun WrittenReviewPage(
     movieReviewViewModel: MovieReviewViewModel,
     replyViewModel: ReplyViewModel
 ) {
-    val comments by reviewViewModel.comments.collectAsState(initial = emptyList())
+    val myComments by reviewViewModel.myComments.collectAsState(initial = emptyList())
 
     val isLoading by reviewViewModel.isLoading.collectAsState()
 
@@ -102,7 +102,7 @@ fun WrittenReviewPage(
                         .padding(bottom = 4.dp),
                     verticalArrangement = Arrangement.spacedBy(4.dp)
                 ) {
-                    items(comments) { comment ->
+                    items(myComments) { comment ->
                         MovieDetailReviews(
                             comment,
                             navController,

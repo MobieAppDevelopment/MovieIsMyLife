@@ -72,7 +72,20 @@ fun MyPage(
                     } else {
                         signInViewModel.myComments.value?.size.toString()
                     },
-                    onClick = { navController.navigate("writtenReviews") }
+                    onClick = {
+                        var userId = ""
+                        when (val state = uiState) {
+                            is SignInState.Success -> {
+                                val user = state.user
+                                userId = user.id
+                            }
+                            is SignInState.Error -> {}
+                            is SignInState.Loading -> {}
+                            is SignInState.Nothing -> {Log.d("now", "nothing")}
+                        }
+                        reviewViewModel.loadMyComments(userId = userId)
+                        navController.navigate("writtenReviews")
+                    }
                 )
                 ReviewSection(
                     title = "좋아요한 리뷰",

@@ -30,6 +30,9 @@ class ReviewViewModel : ViewModel() {
     private val _comments = MutableStateFlow<List<CommentView>>(emptyList())
     val comments = _comments.asStateFlow()
 
+    private val _myComments = MutableStateFlow<List<CommentView>>(emptyList())
+    val myComments = _myComments.asStateFlow()
+
     private val _isLoading = MutableStateFlow(true) // 로드 상태 관리
     val isLoading: StateFlow<Boolean> = _isLoading
 
@@ -130,6 +133,72 @@ class ReviewViewModel : ViewModel() {
                 // UI 업데이트 (Main Thread)
                 withContext(Dispatchers.Main) {
                     _comments.value = commentList
+                }
+                _isLoading.value = false
+            } catch (e: Exception) {
+                e.printStackTrace()
+            }
+        }
+    }
+
+    fun loadMyComments(userId: String) { // userId: 로그인돼있는 유저
+        viewModelScope.launch {
+            _isLoading.value = true
+            _myComments.value = emptyList()
+
+            val db = FirebaseFirestore.getInstance()
+
+            try {
+                // Firestore에서 댓글 가져오기
+                val querySnapshot = db.collection("comments")
+                    .get()
+                    .await()
+
+                val commentList = mutableListOf<CommentView>()
+
+                for (document in querySnapshot) {
+                    val documentId = document.id
+                    val comment = document.toObject(Comment::class.java)
+
+                    // Firestore에서 사용자 정보 가져오기
+                    val (name, profile) = fetchName(comment.userId)
+
+                    // Firestore에서 좋아요 정보 가져오기
+                    val userLike = fetchUserLike(userId, documentId) // userId: 로그인돼있는 유저
+                    Log.d("wtf", "${userLike}")
+
+                    // 좋아요 개수 카운트
+                    var likeCount = 0
+                    // Firestore에서 댓글 가져오기
+                    val querySnapshot2 = db.collection("comments")
+                        .document(documentId)
+                        .collection("likeUsers")
+                        .get()
+                        .await()
+                    for (document in querySnapshot2) {
+                        likeCount += 1
+                    }
+
+                    // CommentView 생성
+                    val commentView = CommentView(
+                        score = comment.score,
+                        content = comment.content,
+                        name = name ?: "Unknown",
+                        profile = profile ?: "",
+                        title = "",
+                        posterImage = "",
+                        createdAt = comment.createdAt,
+                        commentId = documentId,
+                        movieId = "",
+                        userLike = userLike,
+                        likeCount = likeCount
+                    )
+                    commentList.add(commentView)
+                }
+
+                // UI 업데이트 (Main Thread)
+                withContext(Dispatchers.Main) {
+                    _myComments.value = commentList
                 }
                 _isLoading.value = false
             } catch (e: Exception) {
