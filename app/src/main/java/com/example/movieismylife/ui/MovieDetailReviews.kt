@@ -118,11 +118,13 @@ fun MovieDetailReviews(
                                     likeCount -= 1
                                     reviewViewModel.deleteLikeUser(userId = userId, commentId = review.commentId)
                                     reviewViewModel.deleteUserLike(userId = userId, commentId = review.commentId)
+                                    signInViewModel.getLikeComments(id = userId)
                                 } else {
                                     userLike = true
                                     likeCount += 1
                                     reviewViewModel.createLike(userId = userId, review.commentId)
                                     reviewViewModel.createUserLike(userId = userId, commentId = review.commentId, movieTitle = movieDetail!!.title, moviePoster = movieDetail.posterPath ?: "") // 왜 moviePoster에는 !!가 안되고 ?: ""를 써야 되나?
+                                    signInViewModel.getLikeComments(id = userId)
                                 }
 
                             })
