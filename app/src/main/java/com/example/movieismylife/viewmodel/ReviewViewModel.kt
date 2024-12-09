@@ -380,6 +380,10 @@ class ReviewViewModel : ViewModel() {
         }
     }
 
+    fun loadReviewType(reviewType: String) {
+        _reviewType.value = reviewType
+    }
+
     // 댓글을 비동기적으로 불러오는 함수
     fun loadMyLikeComments(userId: String) { // userId: 로그인돼있는 유저
         viewModelScope.launch {

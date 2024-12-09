@@ -57,6 +57,7 @@ import androidx.compose.runtime.saveable.rememberSaveable
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Brush
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.RectangleShape
@@ -64,12 +65,18 @@ import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+import androidx.compose.ui.viewinterop.AndroidView
+import androidx.lifecycle.LifecycleOwner
+import androidx.lifecycle.compose.LocalLifecycleOwner
 import androidx.navigation.NavController
 import coil.compose.rememberAsyncImagePainter
 import com.example.movieismylife.enum.SortOption
+import com.example.movieismylife.model.Credits
+import com.example.movieismylife.model.Movies
 import com.example.movieismylife.response.MovieDetailResponse
 import com.example.movieismylife.ui.MovieDetailReviews
 import com.example.movieismylife.ui.ReviewItem
+import com.example.movieismylife.viewmodel.CreditViewModel
 import com.example.movieismylife.viewmodel.MovieDetailViewModel
 import com.example.movieismylife.viewmodel.MovieListViewModel
 import com.example.movieismylife.viewmodel.MovieReviewViewModel
@@ -77,6 +84,9 @@ import com.example.movieismylife.viewmodel.ReplyViewModel
 import com.example.movieismylife.viewmodel.ReviewViewModel
 import com.example.movieismylife.viewmodel.SignInState
 import com.example.movieismylife.viewmodel.SignInViewModel
+import com.pierfrancescosoffritti.androidyoutubeplayer.core.player.YouTubePlayer
+import com.pierfrancescosoffritti.androidyoutubeplayer.core.player.listeners.AbstractYouTubePlayerListener
+import com.pierfrancescosoffritti.androidyoutubeplayer.core.player.views.YouTubePlayerView
 import kotlinx.coroutines.delay
 
 @OptIn(ExperimentalMaterial3Api::class)
@@ -88,6 +98,7 @@ fun MovieDetailPage(
     reviewViewModel: ReviewViewModel,
     replyViewModel: ReplyViewModel,
     signInViewModel: SignInViewModel,
+    creditViewModel: CreditViewModel,
     onClickBackArrow: () -> Unit,
 ) {
     // Sample data
@@ -108,199 +119,218 @@ fun MovieDetailPage(
             modifier = Modifier
                 .fillMaxSize()
                 .padding(innerPadding),
+//                .verticalScroll(rememberScrollState()), // 스크롤 가능하도록 설정
             color = Color.Black
         ) {
-            Column {
-                Card(
-                    shape = RectangleShape,
-                    colors = CardDefaults.cardColors(
-                        containerColor = Color.LightGray,
-                    ),
-                ) {
-                    Box(
-                        modifier = Modifier.height(340.dp)
+            LazyColumn {
+                item {
+                    Card(
+                        shape = RectangleShape,
+                        colors = CardDefaults.cardColors(
+                            containerColor = Color.LightGray,
+                        ),
                     ) {
-                        Image(
-                            painter = rememberAsyncImagePainter(
-                                model = poster_path + movieDetail?.backdropPath
-                            ),
-                            contentDescription = "Loaded image",
-                            modifier = Modifier
-                                .fillMaxSize(),
-                            contentScale = ContentScale.Crop, // 이미지의 자르기와 맞춤 설정
-                            alignment = Alignment.TopStart
-                        )
                         Box(
-                            modifier = Modifier
-                                .fillMaxSize()
-                                .background(
-                                    Brush.verticalGradient(
-                                        colors = listOf(
-                                            Color.Transparent,
-                                            Color.Black,
-                                        ),
-                                        startY = -200f,
-                                        endY = 900f
-                                    )
-                                )
-                        )
-                        Box(){
-                            IconButton(onClick = onClickBackArrow) {
-                                Icon(
-                                    imageVector = Icons.AutoMirrored.Filled.ArrowBack,
-                                    contentDescription = null,
-                                    tint = Color.White
-                                )
-                            }
-                        }
-                        Row(
-                            modifier = Modifier
-                                .fillMaxHeight()
-                                .align(Alignment.BottomStart)
-                                .padding(start = 16.dp, top = 110.dp)
+                            modifier = Modifier.height(340.dp)
                         ) {
-                            Card(
-                                shape = RoundedCornerShape(8.dp)
-                            ) {
-                                Image(
-                                    painter = rememberAsyncImagePainter(
-                                        model = poster_path + movieDetail?.posterPath
-                                    ),
-                                    contentDescription = "Loaded image",
-                                    modifier = Modifier
-                                        .width(150.dp)
-                                        .height(230.dp),
-                                    contentScale = ContentScale.Crop // 이미지의 자르기와 맞춤 설정
-                                )
-                            }
-                            Column(
+                            Image(
+                                painter = rememberAsyncImagePainter(
+                                    model = poster_path + movieDetail?.backdropPath
+                                ),
+                                contentDescription = "Loaded image",
                                 modifier = Modifier
-                                    .fillMaxWidth()
-                                    .padding(top = 130.dp, end = 12.dp),
-                                horizontalAlignment = Alignment.End
+                                    .fillMaxSize(),
+                                contentScale = ContentScale.Crop, // 이미지의 자르기와 맞춤 설정
+                                alignment = Alignment.TopStart
+                            )
+                            Box(
+                                modifier = Modifier
+                                    .fillMaxSize()
+                                    .background(
+                                        Brush.verticalGradient(
+                                            colors = listOf(
+                                                Color.Transparent,
+                                                Color.Black,
+                                            ),
+                                            startY = -200f,
+                                            endY = 900f
+                                        )
+                                    )
+                            )
+                            Box() {
+                                IconButton(onClick = onClickBackArrow) {
+                                    Icon(
+                                        imageVector = Icons.AutoMirrored.Filled.ArrowBack,
+                                        contentDescription = null,
+                                        tint = Color.White
+                                    )
+                                }
+                            }
+                            Row(
+                                modifier = Modifier
+                                    .fillMaxHeight()
+                                    .align(Alignment.BottomStart)
+                                    .padding(start = 16.dp, top = 110.dp)
                             ) {
-                                Text(
-                                    text = movieDetail?.title ?: "제목없음",
-                                    color = Color.White,
-                                    fontSize = 20.sp,
-                                    fontWeight = FontWeight.Bold,
-                                    modifier = Modifier.padding(4.dp)
-                                )
-                                Text(
-                                    text = year ?: "날짜 없음",
-                                    color = Color.White,
-                                    fontSize = 14.sp
-                                )
-                                Spacer(
+                                Card(
+                                    shape = RoundedCornerShape(8.dp)
+                                ) {
+                                    Image(
+                                        painter = rememberAsyncImagePainter(
+                                            model = poster_path + movieDetail?.posterPath
+                                        ),
+                                        contentDescription = "Loaded image",
+                                        modifier = Modifier
+                                            .width(150.dp)
+                                            .height(230.dp),
+                                        contentScale = ContentScale.Crop // 이미지의 자르기와 맞춤 설정
+                                    )
+                                }
+                                Column(
                                     modifier = Modifier
-                                        .height(10.dp)
-                                )
-                                Row {
-                                    Icon(
-                                        imageVector = Icons.Default.Star,
-                                        contentDescription = null,
-                                        tint = Color.White,
-                                        modifier = Modifier
-                                            .size(20.dp)
-                                            .padding(top = 3.dp)
+                                        .fillMaxWidth()
+                                        .padding(top = 130.dp, end = 12.dp),
+                                    horizontalAlignment = Alignment.End
+                                ) {
+                                    Text(
+                                        text = movieDetail?.title ?: "제목없음",
+                                        color = Color.White,
+                                        fontSize = 20.sp,
+                                        fontWeight = FontWeight.Bold,
+                                        modifier = Modifier.padding(4.dp)
+                                    )
+                                    Text(
+                                        text = year ?: "날짜 없음",
+                                        color = Color.White,
+                                        fontSize = 14.sp
                                     )
                                     Spacer(
                                         modifier = Modifier
-                                            .width(3.dp)
+                                            .height(10.dp)
                                     )
-                                    Text(
-                                        text = String.format(
-                                            "%.1f",
-                                            averageScore
-                                        ),
-                                        color = Color.White
-                                    )
-                                    Spacer(
-                                        modifier = Modifier
-                                            .width(10.dp)
-                                    )
-                                    Text(
-                                        text = "TMDB",
-                                        color = Color.Yellow
-                                    )
-                                    Icon(
-                                        imageVector = Icons.Default.Star,
-                                        contentDescription = null,
-                                        tint = Color.White,
-                                        modifier = Modifier
-                                            .size(20.dp)
-                                            .padding(top = 3.dp)
-                                    )
-                                    Spacer(
-                                        modifier = Modifier
-                                            .width(3.dp)
-                                    )
-                                    Text(
-                                        text = String.format(
-                                            "%.1f",
-                                            movieDetail?.voteAverage ?: 0.0
-                                        ),
-                                        color = Color.White
-                                    )
+                                    Row {
+                                        Icon(
+                                            imageVector = Icons.Default.Star,
+                                            contentDescription = null,
+                                            tint = Color.White,
+                                            modifier = Modifier
+                                                .size(20.dp)
+                                                .padding(top = 3.dp)
+                                        )
+                                        Spacer(
+                                            modifier = Modifier
+                                                .width(3.dp)
+                                        )
+                                        Text(
+                                            text = String.format(
+                                                "%.1f",
+                                                averageScore
+                                            ),
+                                            color = Color.White
+                                        )
+                                        Spacer(
+                                            modifier = Modifier
+                                                .width(12.dp)
+                                        )
+                                        Text(
+                                            text = "TMDB",
+                                            color = Color.Yellow
+                                        )
+                                        Icon(
+                                            imageVector = Icons.Default.Star,
+                                            contentDescription = null,
+                                            tint = Color.White,
+                                            modifier = Modifier
+                                                .size(20.dp)
+                                                .padding(top = 3.dp)
+                                        )
+                                        Spacer(
+                                            modifier = Modifier
+                                                .width(3.dp)
+                                        )
+                                        Text(
+                                            text = String.format(
+                                                "%.1f",
+                                                movieDetail?.voteAverage ?: 0.0
+                                            ),
+                                            color = Color.White
+                                        )
+                                    }
                                 }
                             }
                         }
                     }
-                }
-                Row(
-                    modifier = Modifier
-                        .padding(top = 20.dp, bottom = 20.dp)
-                        .fillMaxWidth(),
-                    horizontalArrangement = Arrangement.Center
-                ) {
-                    Box(
-                        modifier = Modifier.clickable(onClick = { if(!isMovieDetail) isMovieDetail = !isMovieDetail })
-                    ) {
-                        Text(
-                            text = "작품 정보",
-                            color = Color.White, // Set the text color
-                            fontSize = 18.sp // Set the text size
-                        )
-                    }
-                    Spacer(
+                    Row(
                         modifier = Modifier
-                            .width(140.dp)
-                    )
-                    Box(
-                        modifier = Modifier.clickable(onClick =
+                            .padding(top = 20.dp, bottom = 20.dp)
+                            .fillMaxWidth(),
+                        horizontalArrangement = Arrangement.Center
+                    ) {
+                        Box(
+                            modifier = Modifier.clickable(onClick = {
+                                if (!isMovieDetail) isMovieDetail = !isMovieDetail
+                            })
+                        ) {
+                            Text(
+                                text = "작품 정보",
+                                color = Color.White, // Set the text color
+                                fontSize = 18.sp // Set the text size
+                            )
+                        }
+                        Spacer(
+                            modifier = Modifier
+                                .width(140.dp)
+                        )
+                        Box(
+                            modifier = Modifier.clickable(onClick =
                             {
-                                if(isMovieDetail) isMovieDetail = !isMovieDetail
-                                reviewViewModel.loadComments(movieDetail?.id.toString(), userId = userId) // user: 로그인돼있는 유저
+                                if (isMovieDetail) isMovieDetail = !isMovieDetail
+                                reviewViewModel.loadComments(
+                                    movieDetail?.id.toString(),
+                                    userId = userId
+                                ) // user: 로그인돼있는 유저
                                 Log.d("check^^", "checking&")
                             }
-                        )
-                    ) {
-                        Text(
-                            text = "리뷰",
-                            color = Color.White, // Set the text color
-                            fontSize = 18.sp // Set the text size
-                        )
+                            )
+                        ) {
+                            Text(
+                                text = "리뷰",
+                                color = Color.White, // Set the text color
+                                fontSize = 18.sp // Set the text size
+                            )
+                        }
                     }
+                    if (isMovieDetail) MovieDetailInfo(
+                        movieDetail,
+                        creditViewModel,
+                        movieDetailViewModel
+                    )
+                    else Review(
+                        navController,
+                        movieReviewViewModel,
+                        reviewViewModel,
+                        movieDetailViewModel,
+                        replyViewModel,
+                        signInViewModel
+                    )
                 }
-                if(isMovieDetail) MovieDetailInfo(movieDetail)
-                else Review(
-                    navController,
-                    movieReviewViewModel,
-                    reviewViewModel,
-                    movieDetailViewModel,
-                    replyViewModel,
-                    signInViewModel
-                )
             }
         }
     }
 }
 
 @Composable
-fun MovieDetailInfo(movieDetail : MovieDetailResponse?) {
+fun MovieDetailInfo(
+    movieDetail : MovieDetailResponse?,
+    creditViewModel: CreditViewModel,
+    movieDetailViewModel: MovieDetailViewModel
+    ) {
+    val castList = creditViewModel.creditList.value
+
     Column(
         modifier = Modifier
             .padding(start = 10.dp, end = 10.dp)
+//            .verticalScroll(rememberScrollState()), // 스크롤 가능하도록 설정
     ){
         Text(
             text = movieDetail?.overview ?: "제목없음",
@@ -404,6 +434,100 @@ fun MovieDetailInfo(movieDetail : MovieDetailResponse?) {
             }
         }
     }
+    // Action Section
+    Text(
+        "출연진",
+        color = Color.White,
+        fontSize = 18.sp,
+        modifier = Modifier.padding(16.dp, top = 30.dp, bottom = 10.dp)
+    )
+    LazyRow(
+        horizontalArrangement = Arrangement.spacedBy(10.dp),
+        contentPadding = PaddingValues(horizontal = 16.dp)
+    ) {
+        itemsIndexed(castList) { index, cast ->
+            if(index < 10) {
+                castCard(
+                    cast = cast
+                )
+            }
+        }
+    }
+    Text(
+        "예고편",
+        color = Color.White,
+        fontSize = 18.sp,
+        modifier = Modifier.padding(16.dp, top = 30.dp, bottom = 10.dp)
+    )
+    YouTubePlayerScreen(
+        lifecycleOwner = LocalLifecycleOwner.current,
+        movieDetailViewModel = movieDetailViewModel
+    )
+}
+
+@Composable
+fun YouTubePlayerScreen(
+    lifecycleOwner: LifecycleOwner,
+    movieDetailViewModel: MovieDetailViewModel
+) {
+    val video by movieDetailViewModel.video.collectAsState()
+
+    // YouTubePlayerView 초기화 및 비디오 로드
+    AndroidView(
+        modifier = Modifier
+            .fillMaxWidth()
+            .padding(bottom = 40.dp)
+            .clip(RoundedCornerShape(6.dp)),
+        factory = { context ->
+            YouTubePlayerView(context = context).apply {
+                // YouTubePlayerView 초기화 (초기화 메서드 변경됨)
+                lifecycleOwner.lifecycle.addObserver(this)  // lifecycleObserver 추가
+
+                // YouTubePlayerView에 YouTubePlayer 객체 설정
+                addYouTubePlayerListener(object : AbstractYouTubePlayerListener() {
+                    override fun onReady(youTubePlayer: YouTubePlayer) {
+                        youTubePlayer.cueVideo(video, 0f)
+                    }
+                })
+            }
+        }
+    )
+}
+
+@Composable
+fun castCard(
+    cast: Credits
+) {
+    val poster_path = "https://media.themoviedb.org/t/p/w220_and_h330_face/"
+
+        Column(
+        ) {
+            Card(
+                modifier = Modifier
+                    .width(80.dp)
+                    .height(120.dp),
+                elevation = CardDefaults.cardElevation(4.dp)
+            ) {
+                Image(
+                    painter = rememberAsyncImagePainter(
+                        model = poster_path + cast.profilePath
+                    ),
+                    contentDescription = "Loaded image",
+                    modifier = Modifier
+                        .width(80.dp)
+                        .height(120.dp),
+                    contentScale = ContentScale.Crop // 이미지의 자르기와 맞춤 설정
+                )
+            }
+            Text(
+                text = cast.name,
+                color = Color.White,
+                modifier = Modifier
+                    .width(80.dp)
+                    .padding(top = 10.dp, start = 4.dp),
+                fontSize = 10.sp
+            )
+        }
 }
 
 @Composable
@@ -442,13 +566,12 @@ fun Review(
         movieReviewViewModel.setSortOption(SortOption.LATEST)
 //    reviewViewModel.createReview("1", movieId,"Amazing Movie!", 5f)
 //    reviewViewModel.loadComments(movieId)
-        LazyColumn(
+        Column(
             modifier = Modifier
                 .fillMaxSize()
                 .padding(bottom = 4.dp),
             verticalArrangement = Arrangement.spacedBy(4.dp)
         ) {
-            item {
                 Box(
                     modifier = Modifier
                         .fillMaxWidth()
@@ -489,8 +612,7 @@ fun Review(
                         }
                     }
                 }
-            }
-            items(comments) { comment ->
+            comments.forEach { comment ->
                 MovieDetailReviews(comment, navController, reviewViewModel, replyViewModel, movieDetailViewModel, signInViewModel)
             }
         }
