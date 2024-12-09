@@ -64,6 +64,7 @@ fun ReviewWritePage(
                             navController.popBackStack()
                             reviewViewModel.createReview(userId = userId, movieId = movieId, content = reviewText, score = score)
                             reviewViewModel.loadComments(movieId = movieId, userId = userId)
+                            reviewViewModel.calculateAverageScore(movieId = movieId)
                                   },
                         enabled = reviewText.isNotEmpty()
                     ) {

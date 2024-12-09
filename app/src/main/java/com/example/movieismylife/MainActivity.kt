@@ -24,6 +24,7 @@ import androidx.navigation.compose.rememberNavController
 import androidx.navigation.navArgument
 import com.example.movieismylife.model.LocationDataManager
 import com.example.movieismylife.ui.theme.MovieIsMyLifeTheme
+import com.example.movieismylife.viewmodel.CreditViewModel
 import com.example.movieismylife.viewmodel.MapViewModel
 import com.example.movieismylife.viewmodel.MovieDetailViewModel
 import com.example.movieismylife.viewmodel.MovieListViewModel
@@ -79,6 +80,7 @@ class MainActivity : ComponentActivity() {
                 val replyViewModel = viewModel<ReplyViewModel>()
                 val signUpViewModel = viewModel<SignUpViewModel>()
                 val signInViewModel = viewModel<SignInViewModel>()
+                val creditViewModel = viewModel<CreditViewModel>()
                 val uiState by signInViewModel.state.collectAsState()
                 val getUserId = (uiState as? SignInState.Success)?.user?.id ?: -1
                 val userId = getUserId.toString()
@@ -149,7 +151,8 @@ class MainActivity : ComponentActivity() {
                             movieDetailViewModel = movieDetailViewModel,
                             navController=navController,
                             reviewViewModel = reviewViewModel,
-                            signInViewModel = signInViewModel
+                            signInViewModel = signInViewModel,
+                            creditViewModel = creditViewModel,
                         )
                     }
                     composable(route = "detail"){
@@ -160,6 +163,7 @@ class MainActivity : ComponentActivity() {
                             reviewViewModel=reviewViewModel,
                             replyViewModel=replyViewModel,
                             signInViewModel=signInViewModel,
+                            creditViewModel=creditViewModel,
                             onClickBackArrow = {
                                 navController.popBackStack()
                             }
@@ -173,7 +177,8 @@ class MainActivity : ComponentActivity() {
                         SearchResultPage(
                             movieListViewModel = movieListViewModel,
                             movieDetailViewModel = movieDetailViewModel,
-                            navController=navController
+                            navController=navController,
+                            creditViewModel = creditViewModel
                         )
                     }
                     composable(route = "map",

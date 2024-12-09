@@ -30,6 +30,7 @@ import androidx.navigation.NavController
 import coil.compose.rememberAsyncImagePainter
 import com.example.movieismylife.R
 import com.example.movieismylife.model.Movies
+import com.example.movieismylife.viewmodel.CreditViewModel
 import com.example.movieismylife.viewmodel.MovieDetailViewModel
 import com.example.movieismylife.viewmodel.MovieListViewModel
 
@@ -39,7 +40,8 @@ import com.example.movieismylife.viewmodel.MovieListViewModel
 fun SearchResultPage(
     navController: NavController,
     movieListViewModel: MovieListViewModel,
-    movieDetailViewModel: MovieDetailViewModel
+    movieDetailViewModel: MovieDetailViewModel,
+    creditViewModel: CreditViewModel
 ) {
     // Sample data
     val searchResultMovies = movieListViewModel.searchMovieList.value
@@ -126,6 +128,7 @@ fun SearchResultPage(
                             movie = movie,
                             clickDetailEvent = {
                                 movieDetailViewModel.fetchMovieDetail(it.id)
+                                creditViewModel.fetchCast(it.id)
                                 navController.navigate("detail")
                             }
                         )

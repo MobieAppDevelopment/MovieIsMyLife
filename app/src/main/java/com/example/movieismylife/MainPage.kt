@@ -50,6 +50,7 @@ import androidx.compose.ui.unit.sp
 import androidx.navigation.NavController
 import coil.compose.rememberAsyncImagePainter
 import com.example.movieismylife.model.Movies
+import com.example.movieismylife.viewmodel.CreditViewModel
 import com.example.movieismylife.viewmodel.MovieDetailViewModel
 import com.example.movieismylife.viewmodel.MovieListViewModel
 import com.example.movieismylife.viewmodel.ReviewViewModel
@@ -63,7 +64,8 @@ fun MainPage(
     movieListViewModel: MovieListViewModel,
     movieDetailViewModel: MovieDetailViewModel,
     reviewViewModel: ReviewViewModel,
-    signInViewModel: SignInViewModel
+    signInViewModel: SignInViewModel,
+    creditViewModel: CreditViewModel
 ) {
     // Sample data
     val popularMovies = movieListViewModel.popularMovieList.value
@@ -120,6 +122,7 @@ fun MainPage(
                             rank = index,
                             clickDetailEvent = {
                                 movieDetailViewModel.fetchMovieDetail(it.id)
+                                creditViewModel.fetchCast(it.id)
                                 reviewViewModel.calculateAverageScore(movieId = it.id.toString())
                                 navController.navigate("detail")
                             }
@@ -144,6 +147,7 @@ fun MainPage(
                             movie = movie,
                             clickDetailEvent = {
                                 movieDetailViewModel.fetchMovieDetail(it.id)
+                                creditViewModel.fetchCast(it.id)
                                 reviewViewModel.calculateAverageScore(movieId = it.id.toString())
                                 navController.navigate("detail")
                             }
@@ -168,6 +172,7 @@ fun MainPage(
                             movie = movie,
                             clickDetailEvent = {
                                 movieDetailViewModel.fetchMovieDetail(it.id)
+                                creditViewModel.fetchCast(it.id)
                                 reviewViewModel.calculateAverageScore(movieId = it.id.toString())
                                 navController.navigate("detail")
                             }
@@ -192,6 +197,7 @@ fun MainPage(
                             movie = movie,
                             clickDetailEvent = {
                                 movieDetailViewModel.fetchMovieDetail(it.id)
+                                creditViewModel.fetchCast(it.id)
                                 reviewViewModel.calculateAverageScore(movieId = it.id.toString())
                                 navController.navigate("detail")
                             }

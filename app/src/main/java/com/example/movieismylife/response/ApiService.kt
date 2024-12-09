@@ -35,4 +35,11 @@ interface ApiService {
         @Query("api_key") apiKey: String = API_KEY,
         @Query("language") language: String = "ko-KR",
     ): Call<MovieDetailResponse>
+
+    @GET("movie/{movie_id}/credits")
+    fun getCredits(
+        @Path(value = "movie_id") movieId: Int,
+        @Query("api_key") apiKey: String = API_KEY,
+        @Query("language") language: String = "ko-KR",
+    ): Call<CreditsResponse>
 }
