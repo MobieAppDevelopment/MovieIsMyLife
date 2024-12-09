@@ -178,7 +178,8 @@ class MainActivity : ComponentActivity() {
                             movieListViewModel = movieListViewModel,
                             movieDetailViewModel = movieDetailViewModel,
                             navController=navController,
-                            creditViewModel = creditViewModel
+                            creditViewModel = creditViewModel,
+                            reviewViewModel = reviewViewModel
                         )
                     }
                     composable(route = "map",
@@ -228,7 +229,7 @@ class MainActivity : ComponentActivity() {
                             reviewViewModel = reviewViewModel
                         )
                     }
-                    composable(route = "writtenReviews/{userId}", arguments = listOf(
+                    composable(route = "myReviews/{userId}", arguments = listOf(
                         navArgument("userId") {
                             type = NavType.StringType
                         }),
@@ -244,23 +245,6 @@ class MainActivity : ComponentActivity() {
                                 navController.popBackStack()
                             }
                         )
-                    }
-
-                    composable(route = "likedReviews/{userId}", arguments = listOf(
-                        navArgument("userId") {
-                            type = NavType.StringType
-                        }),
-                        enterTransition = { slideInHorizontally() },
-                        exitTransition = { slideOutHorizontally() }
-                    ) {
-                        val userId = it.arguments?.getString("userId") ?: ""
-                        MovieLikeReviewManagementPage(
-                            navController = navController,
-                            userId = userId,
-                            reviewViewModel = reviewViewModel,
-                            onClickBackArrow = {
-                                navController.popBackStack()
-                            })
                     }
 
                     composable(route = "reviewWrite/{movieId}", arguments = listOf(

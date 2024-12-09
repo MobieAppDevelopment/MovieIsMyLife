@@ -57,6 +57,7 @@ import androidx.compose.runtime.saveable.rememberSaveable
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Brush
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.RectangleShape
@@ -64,6 +65,9 @@ import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+import androidx.compose.ui.viewinterop.AndroidView
+import androidx.lifecycle.LifecycleOwner
+import androidx.lifecycle.compose.LocalLifecycleOwner
 import androidx.navigation.NavController
 import coil.compose.rememberAsyncImagePainter
 import com.example.movieismylife.enum.SortOption
@@ -80,6 +84,9 @@ import com.example.movieismylife.viewmodel.ReplyViewModel
 import com.example.movieismylife.viewmodel.ReviewViewModel
 import com.example.movieismylife.viewmodel.SignInState
 import com.example.movieismylife.viewmodel.SignInViewModel
+import com.pierfrancescosoffritti.androidyoutubeplayer.core.player.YouTubePlayer
+import com.pierfrancescosoffritti.androidyoutubeplayer.core.player.listeners.AbstractYouTubePlayerListener
+import com.pierfrancescosoffritti.androidyoutubeplayer.core.player.views.YouTubePlayerView
 import kotlinx.coroutines.delay
 
 @OptIn(ExperimentalMaterial3Api::class)
@@ -223,7 +230,7 @@ fun MovieDetailPage(
                                         )
                                         Spacer(
                                             modifier = Modifier
-                                                .width(10.dp)
+                                                .width(12.dp)
                                         )
                                         Text(
                                             text = "TMDB",
@@ -293,7 +300,11 @@ fun MovieDetailPage(
                             )
                         }
                     }
-                    if (isMovieDetail) MovieDetailInfo(movieDetail, creditViewModel)
+                    if (isMovieDetail) MovieDetailInfo(
+                        movieDetail,
+                        creditViewModel,
+                        movieDetailViewModel
+                    )
                     else Review(
                         navController,
                         movieReviewViewModel,
@@ -312,6 +323,7 @@ fun MovieDetailPage(
 fun MovieDetailInfo(
     movieDetail : MovieDetailResponse?,
     creditViewModel: CreditViewModel,
+    movieDetailViewModel: MovieDetailViewModel
     ) {
     val castList = creditViewModel.creditList.value
 
@@ -427,8 +439,7 @@ fun MovieDetailInfo(
         "출연진",
         color = Color.White,
         fontSize = 18.sp,
-        fontWeight = FontWeight.Bold,
-        modifier = Modifier.padding(16.dp, top = 20.dp, bottom = 10.dp)
+        modifier = Modifier.padding(16.dp, top = 30.dp, bottom = 10.dp)
     )
     LazyRow(
         horizontalArrangement = Arrangement.spacedBy(10.dp),
@@ -442,6 +453,45 @@ fun MovieDetailInfo(
             }
         }
     }
+    Text(
+        "예고편",
+        color = Color.White,
+        fontSize = 18.sp,
+        modifier = Modifier.padding(16.dp, top = 30.dp, bottom = 10.dp)
+    )
+    YouTubePlayerScreen(
+        lifecycleOwner = LocalLifecycleOwner.current,
+        movieDetailViewModel = movieDetailViewModel
+    )
+}
+
+@Composable
+fun YouTubePlayerScreen(
+    lifecycleOwner: LifecycleOwner,
+    movieDetailViewModel: MovieDetailViewModel
+) {
+    val video by movieDetailViewModel.video.collectAsState()
+
+    // YouTubePlayerView 초기화 및 비디오 로드
+    AndroidView(
+        modifier = Modifier
+            .fillMaxWidth()
+            .padding(bottom = 40.dp)
+            .clip(RoundedCornerShape(6.dp)),
+        factory = { context ->
+            YouTubePlayerView(context = context).apply {
+                // YouTubePlayerView 초기화 (초기화 메서드 변경됨)
+                lifecycleOwner.lifecycle.addObserver(this)  // lifecycleObserver 추가
+
+                // YouTubePlayerView에 YouTubePlayer 객체 설정
+                addYouTubePlayerListener(object : AbstractYouTubePlayerListener() {
+                    override fun onReady(youTubePlayer: YouTubePlayer) {
+                        youTubePlayer.cueVideo(video, 0f)
+                    }
+                })
+            }
+        }
+    )
 }
 
 @Composable
@@ -450,32 +500,34 @@ fun castCard(
 ) {
     val poster_path = "https://media.themoviedb.org/t/p/w220_and_h330_face/"
 
-    Column(
-    ) {
-        Card(
-            modifier = Modifier
-                .width(80.dp)
-                .height(120.dp),
-            elevation = CardDefaults.cardElevation(4.dp)
+        Column(
         ) {
-            Image(
-                painter = rememberAsyncImagePainter(
-                    model = poster_path + cast.profilePath
-                ),
-                contentDescription = "Loaded image",
+            Card(
                 modifier = Modifier
                     .width(80.dp)
                     .height(120.dp),
-                contentScale = ContentScale.Crop // 이미지의 자르기와 맞춤 설정
+                elevation = CardDefaults.cardElevation(4.dp)
+            ) {
+                Image(
+                    painter = rememberAsyncImagePainter(
+                        model = poster_path + cast.profilePath
+                    ),
+                    contentDescription = "Loaded image",
+                    modifier = Modifier
+                        .width(80.dp)
+                        .height(120.dp),
+                    contentScale = ContentScale.Crop // 이미지의 자르기와 맞춤 설정
+                )
+            }
+            Text(
+                text = cast.name,
+                color = Color.White,
+                modifier = Modifier
+                    .width(80.dp)
+                    .padding(top = 10.dp, start = 4.dp),
+                fontSize = 10.sp
             )
         }
-        Text(
-            text = cast.name,
-            color = Color.White,
-            modifier = Modifier.padding(top = 10.dp, start = 4.dp),
-            fontSize = 10.sp
-        )
-    }
 }
 
 @Composable

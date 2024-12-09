@@ -129,13 +129,16 @@ dependencies {
 
     //Google Map Api
     implementation("com.google.android.gms:play-services-maps:19.0.0")
-    implementation ("com.google.maps.android:maps-compose:2.11.4")
+    implementation("com.google.maps.android:maps-compose:2.11.4")
     implementation("com.google.android.gms:play-services-location:21.3.0")
-    implementation (libs.places)
+    implementation(libs.places)
 
     // firebase
     implementation(platform("com.google.firebase:firebase-bom:33.6.0"))
     implementation("com.google.firebase:firebase-analytics")
+
+    // Youtube Android Player API
+    implementation("com.pierfrancescosoffritti.androidyoutubeplayer:core:12.1.1")
 }
 
 configurations.all {

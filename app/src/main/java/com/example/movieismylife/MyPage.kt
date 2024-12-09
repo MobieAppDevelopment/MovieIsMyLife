@@ -17,6 +17,7 @@ import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.navigation.NavController
+import com.example.movieismylife.enum.SortOption
 import com.example.movieismylife.viewmodel.MovieDetailViewModel
 import com.example.movieismylife.viewmodel.MovieReviewViewModel
 import com.example.movieismylife.viewmodel.MyPageViewModel
@@ -75,16 +76,18 @@ fun MyPage(
                         signInViewModel.myComments.value?.size.toString()
                     },
                     onClick = {
-                        navController.navigate("writtenReviews/${userId}")
+                        navController.navigate("myReviews/${userId}")
                         reviewViewModel.loadMyComments(userId = userId)
+                        reviewViewModel.loadReviewType("MY REVIEW")
                     }
                 )
                 ReviewSection(
                     title = "좋아요한 리뷰",
                     count = signInViewModel.likeComments.value?.size.toString(),
                     onClick = {
-                        navController.navigate("likedReviews/${userId}")
+                        navController.navigate("myReviews/${userId}")
                         reviewViewModel.loadMyLikeComments(userId = userId)
+                        reviewViewModel.loadReviewType("LIKE REVIEW")
                     }
                 )
 

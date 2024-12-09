@@ -97,13 +97,17 @@ fun MovieDetailReviews(
                             modifier = Modifier
                                 .width(10.dp)
                         )
-                        Text(
-                            text = review.name,
-                            color = Color.White
-                        )
+                        Box(
+                            modifier = Modifier.width(238.dp)
+                        ) {
+                            Text(
+                                text = review.name,
+                                color = Color.White
+                            )
+                        }
                         Spacer(
                             modifier = Modifier
-                                .width(200.dp)
+                                .width(10.dp)
                         )
                         Box(
                             modifier = Modifier

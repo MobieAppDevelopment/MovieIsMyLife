@@ -33,8 +33,9 @@ fun MovieReviewManagementPage(
     onClickBackArrow: () -> Unit,
     ) {
     val myComments by reviewViewModel.myComments.collectAsState()
+    val myLikeComments by reviewViewModel.myLikeComments.collectAsState()
     val sortOption by reviewViewModel.sortOption.collectAsState(initial = SortOption.LATEST)
-    val reviewType by reviewViewModel.reviewType.collectAsState(initial = "MY REVIEW")
+    val reviewType by reviewViewModel.reviewType.collectAsState()
 
 //    val reviews by movieReviewViewModel.reviews.collectAsState()
 //    val sortOption by movieReviewViewModel.sortOption.collectAsState()
@@ -113,8 +114,14 @@ fun MovieReviewManagementPage(
                     modifier = Modifier.fillMaxSize(),
                     verticalArrangement = Arrangement.spacedBy(4.dp)
                 ) {
-                    items(myComments) { myComment ->
-                        ReviewItem(myComment = myComment)
+                    if(reviewType == "MY REVIEW") {
+                        items(myComments) { myComment ->
+                            ReviewItem(myComment = myComment)
+                        }
+                    } else {
+                        items(myLikeComments) { myLikeComment ->
+                            ReviewItem(myComment = myLikeComment)
+                        }
                     }
                 }
             }

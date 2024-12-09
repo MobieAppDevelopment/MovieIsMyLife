@@ -123,6 +123,7 @@ fun MainPage(
                             clickDetailEvent = {
                                 movieDetailViewModel.fetchMovieDetail(it.id)
                                 creditViewModel.fetchCast(it.id)
+                                movieDetailViewModel.fetchVideo(it.id)
                                 reviewViewModel.calculateAverageScore(movieId = it.id.toString())
                                 navController.navigate("detail")
                             }
@@ -148,6 +149,7 @@ fun MainPage(
                             clickDetailEvent = {
                                 movieDetailViewModel.fetchMovieDetail(it.id)
                                 creditViewModel.fetchCast(it.id)
+                                movieDetailViewModel.fetchVideo(it.id)
                                 reviewViewModel.calculateAverageScore(movieId = it.id.toString())
                                 navController.navigate("detail")
                             }
@@ -173,6 +175,7 @@ fun MainPage(
                             clickDetailEvent = {
                                 movieDetailViewModel.fetchMovieDetail(it.id)
                                 creditViewModel.fetchCast(it.id)
+                                movieDetailViewModel.fetchVideo(it.id)
                                 reviewViewModel.calculateAverageScore(movieId = it.id.toString())
                                 navController.navigate("detail")
                             }
@@ -198,6 +201,7 @@ fun MainPage(
                             clickDetailEvent = {
                                 movieDetailViewModel.fetchMovieDetail(it.id)
                                 creditViewModel.fetchCast(it.id)
+                                movieDetailViewModel.fetchVideo(it.id)
                                 reviewViewModel.calculateAverageScore(movieId = it.id.toString())
                                 navController.navigate("detail")
                             }

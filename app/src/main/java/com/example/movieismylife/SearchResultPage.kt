@@ -33,6 +33,7 @@ import com.example.movieismylife.model.Movies
 import com.example.movieismylife.viewmodel.CreditViewModel
 import com.example.movieismylife.viewmodel.MovieDetailViewModel
 import com.example.movieismylife.viewmodel.MovieListViewModel
+import com.example.movieismylife.viewmodel.ReviewViewModel
 
 
 @OptIn(ExperimentalMaterial3Api::class)
@@ -41,7 +42,8 @@ fun SearchResultPage(
     navController: NavController,
     movieListViewModel: MovieListViewModel,
     movieDetailViewModel: MovieDetailViewModel,
-    creditViewModel: CreditViewModel
+    creditViewModel: CreditViewModel,
+    reviewViewModel: ReviewViewModel
 ) {
     // Sample data
     val searchResultMovies = movieListViewModel.searchMovieList.value
@@ -129,8 +131,11 @@ fun SearchResultPage(
                             clickDetailEvent = {
                                 movieDetailViewModel.fetchMovieDetail(it.id)
                                 creditViewModel.fetchCast(it.id)
+                                movieDetailViewModel.fetchVideo(it.id)
+                                reviewViewModel.calculateAverageScore(movieId = it.id.toString())
                                 navController.navigate("detail")
-                            }
+                            },
+                            reviewViewModel = reviewViewModel
                         )
                     }
                 }
@@ -144,7 +149,8 @@ fun SearchResultPage(
 @Composable
 fun SearchMovieCard(
     movie: Movies,
-    clickDetailEvent: (movie: Movies) -> Unit
+    clickDetailEvent: (movie: Movies) -> Unit,
+    reviewViewModel: ReviewViewModel
 ) {
     val poster_path = "https://media.themoviedb.org/t/p/w220_and_h330_face/"
     Row(

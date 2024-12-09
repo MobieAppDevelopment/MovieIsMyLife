@@ -81,6 +81,8 @@ fun ReplyPage(
     val uiState by signInViewModel.state.collectAsState()
     val getUserId = (uiState as? SignInState.Success)?.user?.id ?: -1
     val userId = getUserId.toString()
+    val getProfile = (uiState as? SignInState.Success)?.user?.profile ?: -1
+    val profile = getProfile.toString()
 
 //    replyViewModel.createReply("1", comment?.movieId ?: "", comment?.commentId ?: "", "I think so too")
     // 데이터 로딩 함수 호출을 제어
@@ -116,7 +118,7 @@ fun ReplyPage(
                             .padding(top = 24.dp, start = 6.dp)
                             .size(40.dp) // 크기 설정
                             .clip(CircleShape) // 동그라미 모양
-                            .background(getColorFromString(comment!!.profile)) // 배경색 설정
+                            .background(getColorFromString(profile)) // 배경색 설정
                     )
                     OutlinedTextField(
                         value = content,
