@@ -64,6 +64,7 @@ fun ReviewWritePage(
                             navController.popBackStack()
                             reviewViewModel.createReview(userId = userId, movieId = movieId, content = reviewText, score = score)
                             reviewViewModel.loadComments(movieId = movieId, userId = userId)
+                            signInViewModel.getMyComments(id = userId)
                                   },
                         enabled = reviewText.isNotEmpty()
                     ) {

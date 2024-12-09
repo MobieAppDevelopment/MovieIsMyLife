@@ -227,8 +227,6 @@ class MainActivity : ComponentActivity() {
                         navArgument("userId") {
                             type = NavType.StringType
                         }),
-                        enterTransition = { slideInHorizontally() },
-                        exitTransition = { slideOutHorizontally() }
                     ) {
                         val userId = it.arguments?.getString("userId") ?: ""
                         MovieReviewManagementPage(
@@ -245,8 +243,6 @@ class MainActivity : ComponentActivity() {
                         navArgument("userId") {
                             type = NavType.StringType
                         }),
-                        enterTransition = { slideInHorizontally() },
-                        exitTransition = { slideOutHorizontally() }
                     ) {
                         val userId = it.arguments?.getString("userId") ?: ""
                         MovieLikeReviewManagementPage(

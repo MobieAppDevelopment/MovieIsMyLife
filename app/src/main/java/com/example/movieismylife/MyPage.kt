@@ -49,12 +49,12 @@ fun MyPage(
                     .fillMaxSize()
                     .padding(16.dp)
             ) {
+                Spacer(modifier = Modifier.padding(vertical = 32.dp))
+
                 // Profile Section (Same as before)
                 when (val state = uiState) {
                     is SignInState.Success -> {
                         val user = state.user
-                        Log.d("test", user.name)
-                        Log.d("test", user.id)
                         ProfileSection(user.name, user.id)
                     }
 
@@ -64,16 +64,16 @@ fun MyPage(
                 }
 
                 // Stats Section (Same as before)
-                StatsSection()
+                //StatsSection()
 
                 // Review Sections (Now with click handlers)
                 ReviewSection(
                     title = "작성한 리뷰",
-                    count = if(signInViewModel.myComments.value == null) {
-                        "0"
-                    } else {
-                        signInViewModel.myComments.value?.size.toString()
-                    },
+//                    count = if(signInViewModel.myComments.value == null) {
+//                        "0"
+//                    } else {
+//                        signInViewModel.myComments.value?.size.toString()
+//                    },
                     onClick = {
                         navController.navigate("writtenReviews/${userId}")
                         reviewViewModel.loadMyComments(userId = userId)
@@ -81,7 +81,11 @@ fun MyPage(
                 )
                 ReviewSection(
                     title = "좋아요한 리뷰",
-                    count = signInViewModel.likeComments.value?.size.toString(),
+//                    count = if(signInViewModel.likeComments.value == null) {
+//                        "0"
+//                    } else {
+//                        signInViewModel.likeComments.value?.size.toString()
+//                    },
                     onClick = {
                         navController.navigate("likedReviews/${userId}")
                         reviewViewModel.loadMyLikeComments(userId = userId)
@@ -117,14 +121,14 @@ fun ProfileSection(name: String, id: String) {
     ) {
         Box(
             modifier = Modifier
-                .size(80.dp)
+                .size(120.dp)
                 .clip(CircleShape)
                 .background(Color(0xFF3B4155))
         ) {
             Text(
                 text = name.substring(0 until 1),
                 color = Color.White,
-                fontSize = 32.sp,
+                fontSize = 40.sp,
                 modifier = Modifier.align(Alignment.Center)
             )
         }
@@ -132,7 +136,7 @@ fun ProfileSection(name: String, id: String) {
         Text(
             text = name,
             color = Color.White,
-            fontSize = 20.sp,
+            fontSize = 26.sp,
             fontWeight = FontWeight.Bold,
             modifier = Modifier.padding(top = 8.dp)
         )
@@ -182,25 +186,25 @@ fun StatItem(label: String, count: String) {
 }
 
 @Composable
-fun ReviewSection(title: String, count: String, onClick: () -> Unit) {
+fun ReviewSection(title: String, onClick: () -> Unit) {//count: String, onClick: () -> Unit) {
     Row(
         modifier = Modifier
             .fillMaxWidth()
             .clickable(onClick = onClick)
-            .padding(vertical = 8.dp),
+            .padding(vertical = 12.dp),
         horizontalArrangement = Arrangement.SpaceBetween,
         verticalAlignment = Alignment.CenterVertically
     ) {
         Text(
             text = title,
             color = Color.White,
-            fontSize = 16.sp
+            fontSize = 24.sp
         )
-        Text(
-            text = count,
-            color = Color.White,
-            fontSize = 16.sp
-        )
+//        Text(
+//            text = count,
+//            color = Color.White,
+//            fontSize = 16.sp
+//        )
     }
 }
 

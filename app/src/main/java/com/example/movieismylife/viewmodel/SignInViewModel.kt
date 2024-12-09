@@ -61,7 +61,7 @@ class SignInViewModel : ViewModel() {
         }
     }
 
-    private fun getLikeComments(id: String) {
+    public fun getLikeComments(id: String) {
         viewModelScope.launch {
             try {
                 val querySnapshot = firestore.collection("comments").get().await()
@@ -95,21 +95,18 @@ class SignInViewModel : ViewModel() {
                 }
 
             } catch (e: Exception) {
-                Log.d("tset", "너냐?")
                 _state.value = SignInState.Error(e.message ?: "Unknown error occurred")
             }
         }
     }
 
-    private fun getMyComments(id: String) {
+    public fun getMyComments(id: String) {
         viewModelScope.launch {
             try {
-                Log.d("tset", "1")
                 val querySnapshot = firestore.collection("comments")
                     .whereEqualTo("userId", id)
                     .get()
                     .await()
-                Log.d("tset", "2")
 
                 if (!querySnapshot.isEmpty) {
                     val commentList = querySnapshot.documents.mapNotNull { document ->
@@ -125,15 +122,10 @@ class SignInViewModel : ViewModel() {
                             )
                         }
                     }.filterNotNull()
-                    Log.d("tset", "3")
-                    Log.d("tset", "4")
                     _myComments.value = commentList
-                    Log.d("tset", "5")
                 }
 
             } catch (e: Exception) {
-                Log.d("tset", "너야?")
-                Log.d("error is ", e.message!!)
                 _state.value = SignInState.Error(e.message ?: "Unknown error occurred")
             }
         }
