@@ -69,7 +69,7 @@ fun MovieReviewManagementPage(
                         )
                     }
                     Text(
-                        text = "MY REVIEW",
+                        text = reviewType,
                         style = MaterialTheme.typography.titleLarge,
                         fontWeight = FontWeight.Bold,
                         color = Color.White
